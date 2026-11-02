@@ -38,7 +38,7 @@ Applies to active first-party C/C++ code, including examples and native tests.
 - `legacy/` is archived, excluded from builds, and not production code.
   `lib/Events` is an independent third-party submodule; do not rewrite it as
   part of KymoCore style changes.
-- `lib/KymoCore` consumes official CodeName-666/kymocore releases as a pinned
+- `lib/KymoCore` consumes official KymoTrace/kymocore releases as a pinned
   Git submodule. Do not develop or commit library changes in this consumer checkout.
   Develop KymoCore in the separate `../KymoCore` repository, publish a release there,
   then fetch that official tag and update the submodule pointer here.

@@ -7,12 +7,12 @@ Setup, examples, architecture, C/C++ API and checks of the firmware in detail.
 ## Cloning
 
 The KymoCore library is a separate repository
-([CodeName-666/kymocore](https://github.com/CodeName-666/kymocore)) and is
+([KymoTrace/kymocore](https://github.com/KymoTrace/kymocore)) and is
 included here as a Git submodule under `lib/KymoCore`. Therefore clone with
 submodules:
 
 ```sh
-git clone --recurse-submodules https://github.com/CodeName-666/kymoprobe.git
+git clone --recurse-submodules https://github.com/KymoTrace/kymoprobe.git
 ```
 
 In an existing checkout, `git submodule update --init` is enough. Library
@@ -63,9 +63,9 @@ The complete header API can be generated with `doxygen Doxyfile`. The
 [Doxygen guide](doxygen.md) (German) describes the output and documentation
 rules.
 
-[KymoCore](https://github.com/CodeName-666/kymocore/blob/main/docs/GUIDE.md)
+[KymoCore](https://github.com/KymoTrace/kymocore/blob/main/docs/GUIDE.md)
 (separate repository, submodule) documents the configuration, memory and
-callback contracts. [PROTOCOL.md](https://github.com/CodeName-666/kymocore/blob/main/PROTOCOL.md)
+callback contracts. [PROTOCOL.md](https://github.com/KymoTrace/kymocore/blob/main/PROTOCOL.md)
 defines the wire format, identical to KymoStudio. It uses 9–21 bytes per
 measurement: byte-based IDs/flags, explicit little endian, float32, optional
 uint32 milliseconds and a trailing byte. CRC8 is disabled by default; `NO_CRC`
@@ -77,12 +77,12 @@ sent directly.
 The default build contains only the scalar C sender and the Init/Main runtime.
 X, Z, timestamps, CRC, the MCU decoder and the C++ wrapper are enabled via the
 `KYMO_ENABLE_*` switches in
-[`kymo_config.h`](https://github.com/CodeName-666/kymocore/blob/main/src/kymo_config.h):
+[`kymo_config.h`](https://github.com/KymoTrace/kymocore/blob/main/src/kymo_config.h):
 set `0` for off or `1` for on as build flags, or pick a preset with
 `KYMO_PROFILE` (`KYMO_PROFILE_MINIMAL`, `KYMO_PROFILE_XYZ`, `KYMO_PROFILE_TRACE`).
 Explicit switches take precedence over the profile. The runtime can
 also be disabled for codec-only use. The complete switch table is in the
-[KymoCore guide](https://github.com/CodeName-666/kymocore/blob/main/docs/GUIDE.md#minimal-build-and-optional-features).
+[KymoCore guide](https://github.com/KymoTrace/kymocore/blob/main/docs/GUIDE.md#minimal-build-and-optional-features).
 The example projects enable the extras they need explicitly.
 
 For other ECUs only the time, measurement and transport callbacks are adapted.
@@ -375,6 +375,6 @@ unchanged and is not a library dependency.
 
 Active C/C++ functions use at most one `return`, at the end of the function.
 Bit operations, byte conversion and CRC are bundled in an independent
-[common component](https://github.com/CodeName-666/kymocore/blob/main/src/common/README.md).
+[common component](https://github.com/KymoTrace/kymocore/blob/main/src/common/README.md).
 `python tools/test_native.py` also checks the coding rule and the helpers. The
 permanent conventions are in [AGENTS.md](../AGENTS.md).

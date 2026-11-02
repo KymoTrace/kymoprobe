@@ -31,5 +31,5 @@ blockiert Pull Requests ohne diese Bestätigung.
 - Neue Quelldateien beginnen mit der SPDX-Zeile
   `SPDX-License-Identifier: MIT`.
 - Änderungen an der Library selbst gehören nach
-  [kymocore](https://github.com/CodeName-666/kymocore), siehe [README.de.md](README.de.md).
+  [kymocore](https://github.com/KymoTrace/kymocore), siehe [README.de.md](README.de.md).
 - Vor einem Pull Request `python tools/test_native.py` und `python tools/test_package.py` ausführen.

@@ -32,7 +32,7 @@ sichtbaren Messkurven**. Board flashen, in
 wenigen Minuten laufen die Daten über den Bildschirm. Danach ersetzt du die
 Testsignale durch deine eigenen Sensoren, Regelgrößen oder Zustände.
 
-Unter der Haube arbeitet [KymoCore](https://github.com/CodeName-666/kymocore),
+Unter der Haube arbeitet [KymoCore](https://github.com/KymoTrace/kymocore),
 eine schlanke Library ohne Heap und ohne RTOS. Sie plant die Messungen, kodiert
 sie in 9 bis 21 Bytes und schickt sie über die Schnittstelle deiner Wahl.
 KymoProbe zeigt, wie das auf echter Hardware aussieht: per UART, USB oder WLAN
@@ -47,7 +47,7 @@ mit MQTT.
 
 ```sh
 # 1. Mit Submodulen klonen (KymoCore liegt in lib/KymoCore)
-git clone --recurse-submodules https://github.com/CodeName-666/kymoprobe.git
+git clone --recurse-submodules https://github.com/KymoTrace/kymoprobe.git
 
 # 2. ESP32 bauen und flashen
 pio run -e nodemcu-32s -t upload
@@ -132,15 +132,15 @@ Alle Beispiele sind gebaut und geprüft; die wichtigsten baut die CI bei jedem P
 
 | Projekt | Rolle |
 |---|---|
-| [KymoCore](https://github.com/CodeName-666/kymocore) | Library: Messwerte planen, kodieren, senden (hier als Submodul `lib/KymoCore`) |
-| **[KymoProbe](https://github.com/CodeName-666/kymoprobe)** | dieses Repository: Firmware und Hardwarebeispiele |
+| [KymoCore](https://github.com/KymoTrace/kymocore) | Library: Messwerte planen, kodieren, senden (hier als Submodul `lib/KymoCore`) |
+| **[KymoProbe](https://github.com/KymoTrace/kymoprobe)** | dieses Repository: Firmware und Hardwarebeispiele |
 | [KymoStudio](https://kymotrace.de/#download) | Desktop-App: empfangen, darstellen, analysieren, exportieren |
 
 ## Dokumentation
 
 - **[Handbuch](docs/MANUAL.de.md):** Einrichtung, Beispiele, Architektur, C-/C++-API und Prüfung
-- **[KymoCore-Anleitung](https://github.com/CodeName-666/kymocore/blob/main/docs/GUIDE.de.md):** Konfiguration, Features, Transporte
-- **[Protokoll](https://github.com/CodeName-666/kymocore/blob/main/PROTOCOL.md):** Byte-Aufbau der Frames
+- **[KymoCore-Anleitung](https://github.com/KymoTrace/kymocore/blob/main/docs/GUIDE.de.md):** Konfiguration, Features, Transporte
+- **[Protokoll](https://github.com/KymoTrace/kymocore/blob/main/PROTOCOL.md):** Byte-Aufbau der Frames
 - **[Beispiele im Detail](examples/README.md)** · **[Prüfergebnisse](docs/verification.md)** · **[Mitmachen](CONTRIBUTING.de.md)**
 
 ## Lizenz
