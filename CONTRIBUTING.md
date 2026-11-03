@@ -32,6 +32,6 @@ If the English and German versions differ, the German version prevails.
 - New source files start with the SPDX line
   `SPDX-License-Identifier: MIT`.
 - Changes to the library itself belong in
-  [kymocore](https://github.com/CodeName-666/kymocore), see [README.md](README.md).
+  [kymocore](https://github.com/KymoTrace/kymocore), see [README.md](README.md).
 - Run `python tools/test_native.py` and `python tools/test_package.py` before
   opening a pull request.

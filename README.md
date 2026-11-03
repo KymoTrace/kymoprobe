@@ -32,7 +32,7 @@ curves**. Flash the board, connect in
 data scrolls across your screen. Then replace the test signals with your own
 sensors, control variables or states.
 
-Under the hood runs [KymoCore](https://github.com/CodeName-666/kymocore), a lean
+Under the hood runs [KymoCore](https://github.com/KymoTrace/kymocore), a lean
 library without heap and without RTOS. It schedules the measurements, encodes
 them into 9 to 21 bytes and sends them over the interface of your choice.
 KymoProbe shows what this looks like on real hardware: via UART, USB or Wi-Fi
@@ -47,7 +47,7 @@ with MQTT.
 
 ```sh
 # 1. Clone with submodules (KymoCore lives in lib/KymoCore)
-git clone --recurse-submodules https://github.com/CodeName-666/kymoprobe.git
+git clone --recurse-submodules https://github.com/KymoTrace/kymoprobe.git
 
 # 2. Build and flash the ESP32
 pio run -e nodemcu-32s -t upload
@@ -148,15 +148,15 @@ capability details.
 
 | Project | Role |
 |---|---|
-| [KymoCore](https://github.com/CodeName-666/kymocore) | library: schedules, encodes and sends measurements (here as submodule `lib/KymoCore`) |
-| **[KymoProbe](https://github.com/CodeName-666/kymoprobe)** | this repository: firmware and hardware examples |
+| [KymoCore](https://github.com/KymoTrace/kymocore) | library: schedules, encodes and sends measurements (here as submodule `lib/KymoCore`) |
+| **[KymoProbe](https://github.com/KymoTrace/kymoprobe)** | this repository: firmware and hardware examples |
 | [KymoStudio](https://kymotrace.de/#download) | desktop app: receive, display, analyse, export |
 
 ## Documentation
 
 - **[Manual](docs/MANUAL.md):** setup, examples, architecture, C/C++ API and checks
-- **[KymoCore guide](https://github.com/CodeName-666/kymocore/blob/main/docs/GUIDE.md):** configuration, features, transports
-- **[Protocol](https://github.com/CodeName-666/kymocore/blob/main/PROTOCOL.md):** byte layout of the frames
+- **[KymoCore guide](https://github.com/KymoTrace/kymocore/blob/main/docs/GUIDE.md):** configuration, features, transports
+- **[Protocol](https://github.com/KymoTrace/kymocore/blob/main/PROTOCOL.md):** byte layout of the frames
 - **[Examples in detail](examples/README.md)** · **[Verification results](docs/verification.md)** (German) · **[Contributing](CONTRIBUTING.md)**
 
 ## License

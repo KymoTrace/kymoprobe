@@ -7,7 +7,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          submodules: true  # lib/KymoCore kommt aus CodeName-666/kymocore
+          submodules: true  # lib/KymoCore kommt aus KymoTrace/kymocore
       - run: pip install platformio==6.2.0
       - name: Validate archive and build its documented consumers
         run: python3 tools/test_package.py
@@ -17,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          submodules: true  # lib/KymoCore kommt aus CodeName-666/kymocore
+          submodules: true  # lib/KymoCore kommt aus KymoTrace/kymocore
       - name: C99 and C++11 behavior tests
         run: python3 tools/test_native.py
       - name: Configuration and stress contracts
@@ -94,7 +94,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          submodules: true  # lib/KymoCore kommt aus CodeName-666/kymocore
+          submodules: true  # lib/KymoCore kommt aus KymoTrace/kymocore
       - run: pip install platformio==6.2.0
       - name: Provide placeholder network credentials for compilation
         run: |

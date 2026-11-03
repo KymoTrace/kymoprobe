@@ -7,11 +7,11 @@ Einrichtung, Beispiele, Architektur, C-/C++-API und Prüfung der Firmware im Det
 ## Klonen
 
 Die Library KymoCore ist ein eigenes Repository
-([CodeName-666/kymocore](https://github.com/CodeName-666/kymocore)) und hier als
+([KymoTrace/kymocore](https://github.com/KymoTrace/kymocore)) und hier als
 Git-Submodul unter `lib/KymoCore` eingebunden. Deshalb mit Submodulen klonen:
 
 ```sh
-git clone --recurse-submodules https://github.com/CodeName-666/kymoprobe.git
+git clone --recurse-submodules https://github.com/KymoTrace/kymoprobe.git
 ```
 
 In einem bestehenden Checkout reicht `git submodule update --init`.
@@ -60,8 +60,8 @@ und ESP32-Projekte nutzen denselben C++11-Kern.
 Die vollständige Header-API lässt sich mit `doxygen Doxyfile` erzeugen.
 [Doxygen-Anleitung](doxygen.md) beschreibt Ausgabe und Dokumentationsregeln.
 
-[KymoCore](https://github.com/CodeName-666/kymocore/blob/main/docs/GUIDE.de.md) (eigenes Repository, Submodul) dokumentiert die Konfiguration, Speicher-
-und Callback-Verträge. [PROTOCOL.md](https://github.com/CodeName-666/kymocore/blob/main/PROTOCOL.md) definiert das
+[KymoCore](https://github.com/KymoTrace/kymocore/blob/main/docs/GUIDE.de.md) (eigenes Repository, Submodul) dokumentiert die Konfiguration, Speicher-
+und Callback-Verträge. [PROTOCOL.md](https://github.com/KymoTrace/kymocore/blob/main/PROTOCOL.md) definiert das
 mit KymoStudio identische Wire-Format. Es sind 9–21 Bytes pro Messung:
 bytebasierte IDs/Flags, explizites Little Endian, float32, optionale uint32-
 Millisekunden und ein Abschlussbyte. CRC8 ist standardmäßig deaktiviert;
@@ -73,12 +73,12 @@ Keine Pointer oder C-Strukturen werden direkt gesendet.
 Der Standardbuild enthält nur den skalaren C-Sender und die Init/Main-Runtime.
 X, Z, Zeitstempel, CRC, MCU-Decoder und C++-Wrapper werden über die
 `KYMO_ENABLE_*`-Schalter in
-[`kymo_config.h`](https://github.com/CodeName-666/kymocore/blob/main/src/kymo_config.h) zugeschaltet:
+[`kymo_config.h`](https://github.com/KymoTrace/kymocore/blob/main/src/kymo_config.h) zugeschaltet:
 als Build-Flag `0` für aus oder `1` für ein setzen oder per `KYMO_PROFILE`
 ein Preset wählen (`KYMO_PROFILE_MINIMAL`, `KYMO_PROFILE_XYZ`, `KYMO_PROFILE_TRACE`).
 Explizite Schalter haben Vorrang vor dem Profil. Auch die Runtime
 lässt sich für reine Codec-Nutzung abschalten. Die vollständige Schaltertabelle
-steht in [KymoCore/README.md](https://github.com/CodeName-666/kymocore/blob/main/docs/GUIDE.de.md#minimal-build-and-optional-features).
+steht in [KymoCore/README.md](https://github.com/KymoTrace/kymocore/blob/main/docs/GUIDE.de.md#minimal-build-and-optional-features).
 Die Beispielprojekte aktivieren ihre benötigten Extras ausdrücklich.
 
 Für andere ECUs werden ausschließlich Zeit-, Mess- und Transport-Callbacks
@@ -373,6 +373,6 @@ Submodul bleibt unverändert und ist keine Library-Abhängigkeit.
 
 Aktive C/C++-Funktionen verwenden höchstens ein `return` am Funktionsende.
 Bitoperationen, Bytekonvertierung und CRC sind in einer unabhängigen
-[Common-Komponente](https://github.com/CodeName-666/kymocore/blob/main/src/common/README.md) gebündelt.
+[Common-Komponente](https://github.com/KymoTrace/kymocore/blob/main/src/common/README.md) gebündelt.
 `python tools/test_native.py` prüft die Coderegel und die Hilfsfunktionen mit.
 Die dauerhaften Vorgaben stehen in [AGENTS.md](../AGENTS.md).
