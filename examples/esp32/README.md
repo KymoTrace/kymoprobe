@@ -10,6 +10,8 @@
   stack use that grows in steps.
 - [PI controller](pi_controller/README.md): simulated heater whose `kp`, `ki` and
   setpoint KymoStudio tunes live over the KymoCore back channel (needs KymoCore 7.1).
+- [Live variables](live_variables/README.md): globals that KymoStudio picks from the
+  ELF file and the device samples itself (KymoWatch, needs KymoCore 7.3).
 - [Saved task trace example](task_trace_example/RESTORE.md): the previous ESP32
   FreeRTOS/ISR/pipeline example, independently rebuildable and uploadable.
 
