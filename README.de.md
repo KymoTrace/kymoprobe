@@ -128,7 +128,7 @@ Alle Beispiele sind gebaut und geprüft; die wichtigsten baut die CI bei jedem P
 
 ## So hängt alles zusammen
 
-![Vom Messwert zum Diagramm](docs/images/architecture.png)
+![Wie KymoCore, KymoProbe, KymoStudio und kymocore für Python zusammenspielen](docs/images/system-de.svg)
 
 | Projekt | Rolle |
 |---|---|

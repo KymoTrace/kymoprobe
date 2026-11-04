@@ -144,7 +144,7 @@ capability details.
 
 ## How it all fits together
 
-![From measurement to chart](docs/images/architecture.png)
+![How KymoCore, KymoProbe, KymoStudio and kymocore for Python fit together](docs/images/system-en.svg)
 
 | Project | Role |
 |---|---|
