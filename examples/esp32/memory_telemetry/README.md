@@ -29,5 +29,5 @@ pio run -t upload
 2. Nach spätestens 5 s tragen die Signale ihre Namen.
 3. „+ Diagramm“ → „Speicher“: Balken je Task mit Warnschwelle, darunter der Heap.
 
-Bis KymoCore 7.3.0 getaggt ist, baut das Beispiel gegen den KymoCore-Checkout neben
-KymoProbe (`lib_deps = KymoCore=symlink://../../../../KymoCore`, Branch `develop`).
+Das Beispiel verwendet das offizielle KymoCore-Release 7.3.0 aus dem gepinnten
+Submodul `lib/KymoCore`. Ein benachbarter Entwicklungscheckout wird nicht benötigt.

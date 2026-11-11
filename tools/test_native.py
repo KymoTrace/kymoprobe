@@ -57,6 +57,8 @@ def main() -> None:
         os.environ["PATH"] = str(gcc_bin) + os.pathsep + os.environ["PATH"]
     if not shutil.which("gcc") or not shutil.which("g++"):
         parser.error("Install gcc/g++ or: pio pkg install -g -t platformio/toolchain-gccmingw32")
+    run(sys.executable, ROOT / "tools/check_core_version.py")
+    run(sys.executable, "-m", "unittest", "discover", "-s", "tools", "-p", "test_core_version.py")
     BUILD.mkdir(parents=True, exist_ok=True)
     # KymoCore owns its library tests; KymoProbe only checks its own wire consumers.
     run(sys.executable, ROOT / "lib/KymoCore/test/native_test.py")
@@ -77,6 +79,10 @@ def main() -> None:
         run("g++", client, *objects, "-lm", "-o", exe)
         run(exe, capture=True)
         if args.app: verify_app(exe, args.app, crc_enabled)
+    integration = [sys.executable, ROOT / "examples/integration/tests/run.py"]
+    if args.app:
+        integration.extend(["--app", args.app.resolve()])
+    run(*integration)
     print("All native checks passed")
 
 if __name__ == "__main__": main()

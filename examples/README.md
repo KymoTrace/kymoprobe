@@ -1,5 +1,17 @@
 # KymoProbe examples
 
+All examples use the official KymoCore release pinned in `lib/KymoCore`
+(currently **7.3.0**). Probe release tags use the same version as Core;
+see [release and tag policy](../docs/releases.md).
+
+For the modular Endpoint integration start with
+[integration/README.md](integration/README.md) and
+[integration/src/main.cpp](integration/src/main.cpp): one base and separate
+Plot, Parameter, Watch, Memory and Trace headers/implementations. The explicit
+feature configs and status checks remain visible. The existing transport,
+benchmark and generated demos continue to show supported lower-level APIs;
+they do not require an Endpoint to work with 7.3.0.
+
 The larger transport, maximum-throughput and feature applications are selected
 by the repository's central `src/main.cpp`. See [demo modes](../docs/demo-modes.md).
 The standalone board examples below remain available in KymoProbe. KymoCore
@@ -9,6 +21,7 @@ Primary examples (run from repository root):
 
 ```sh
 pio run -e nodemcu-32s
+pio run -d examples/integration -e esp32dev -e uno
 pio run -d examples/arduino/simple_analog_example -e uno
 pio run -d examples/arduino/multi_sensor_example -e uno
 pio run -d examples/esp32/serial_example -e esp32dev
@@ -34,11 +47,9 @@ Keep `examples/common` with the sketches when using the Arduino IDE.
 KymoCore defaults to scalar Y plus the C runtime. These example PlatformIO
 files explicitly enable timestamps; the multidimensional example additionally
 enables X and Z. The repository-root application uses the minimal defaults.
-For Arduino IDE/other build systems, set the required `KYMO_ENABLE_*` values
-directly in `../lib/KymoCore/src/kymo_build_config.h` (path from this directory).
-Alternatively pass matching compiler definitions to the sketch and library;
-a sketch-local define is not sufficient. PlatformIO example build flags override
-the internal header values; remove matching flags to use the header settings.
+For Arduino IDE/other build systems, pass matching `KYMO_ENABLE_*` compiler
+definitions or `KYMO_USER_CONFIG_HEADER` to the sketch and library; a sketch-local
+define is not sufficient. Keep the pinned library checkout unchanged.
 C++ push users must additionally enable `KYMO_ENABLE_CPP=1`.
 See the feature table in `../lib/KymoCore/README.md`.
 

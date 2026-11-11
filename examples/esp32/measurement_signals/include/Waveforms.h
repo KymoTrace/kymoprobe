@@ -9,7 +9,10 @@
 #include <math.h>
 #include "Config.h"
 #include "Types.h"
-/** @brief Phase in [0, 1) of a grid index for a period in samples. */
+/** @brief Phase in [0, 1) of a grid index for a period in samples.
+ * @param[in] sequence Grid index.
+ * @param[in] periodSamples Nonzero number of samples per period.
+ * @return Dimensionless phase in [0, 1). */
 /*******************************************************************************
  * gridPhase
  ******************************************************************************/
@@ -18,7 +21,9 @@ static inline float gridPhase(uint32_t sequence, uint32_t periodSamples)
     return static_cast<float>(sequence % periodSamples) / static_cast<float>(periodSamples);
 }
 
-/** @brief Uniform pseudo-noise in [-1, 1] derived from the grid index. */
+/** @brief Uniform pseudo-noise in [-1, 1] derived from the grid index.
+ * @param[in] sequence Grid index used as the deterministic noise seed.
+ * @return Dimensionless pseudo-noise in [-1, 1]. */
 /*******************************************************************************
  * gridNoise
  ******************************************************************************/

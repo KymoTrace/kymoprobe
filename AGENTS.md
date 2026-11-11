@@ -43,6 +43,11 @@ Applies to active first-party C/C++ code, including examples and native tests.
   Develop KymoCore in the separate `../KymoCore` repository, publish a release there,
   then fetch that official tag and update the submodule pointer here.
   Keep the consumer checkout clean and detached at the selected release.
+- KymoProbe release tags must exactly match the pinned official KymoCore tag
+  (`vX.Y.Z`). Preserve existing tags; never move or overwrite a baseline tag.
+  Every example must consume `lib/KymoCore`, not a sibling development checkout.
+  Follow `docs/releases.md`; run `python tools/check_core_version.py --tag vX.Y.Z`
+  after committing the release changes and before creating a new release tag.
 - Maintain the larger UART, MQTT, TCP, maximum-performance and feature demos
   in this application repository, selectable through `src/main.cpp`.
   KymoCore contains only a few small reference examples; library changes still

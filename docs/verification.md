@@ -1,5 +1,30 @@
 # Prüfstand — 2026-10-05
 
+## KymoCore 7.3.0 und modulare Beispiele — 11.11.2026
+
+Der unveränderte Ausgangsstand `4ad2ba3` ist als `v7.3.0` veröffentlicht.
+Die danach angepassten Beispiele verwenden durchgängig das offizielle,
+unveränderte Core-Submodul `d08fe07` (7.3.0). Die Versionsregeln stehen in
+[releases.md](releases.md).
+
+Lokal erfolgreich geprüft:
+
+- `python tools/test_native.py --app ../KymoStudio`: vollständige native
+  Core-Suite, Strukturprüfung und Probe-/Studio-Protokollintegration.
+- Neues `examples/integration`: tatsächliches setup/loop mit getrenntem
+  Testport; gültige/ungültige Parameteränderungen, Watch, Memory, Plot und
+  abgeschlossene Trace-Session. Zwei Durchläufe mit/ohne Host-Anfragen,
+  Teilübertragungen und Rückstau; Studio-Decoder mit vier Fragmentgrößen.
+- PlatformIO: Live Variables, Memory Telemetry, Benchmark bitwise/table sowie
+  das neue Integrationsbeispiel auf ESP32 und Uno. Uno enthält kein Trace.
+- Versionsprüfung einschließlich negativer Tests für abweichende Tags,
+  benachbarte Entwicklungscheckouts und nicht gepinnte Abhängigkeiten.
+- Aktualisierte Doxygen-Eingaben und Dokumentation ohne Warnungen.
+
+Keine neue Hardware-Abnahme. Die übrigen Beispiele nutzen weiterhin die
+unterstützten Runtime-/Low-Level-/Generator-APIs; die modulare Endpoint-
+Integration ist das neue vollständige Einstiegsbeispiel.
+
 ## PlatformIO-Paketvorbereitung vom 05.10.2026
 
 Die Library wurde als eigenständiges Paket validiert. Ergänzt sind Lizenztext,

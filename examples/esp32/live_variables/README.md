@@ -51,6 +51,5 @@ pio run -t upload
 3. `wave` und `motor.rpm` anhaken, Periode z. B. 20 ms. Beide Kurven erscheinen.
 4. Board neu starten: Studio setzt die Auswahl von selbst wieder.
 
-Bis KymoCore 7.3.0 getaggt ist, baut das Beispiel gegen den KymoCore-Checkout neben
-KymoProbe (`lib_deps = KymoCore=symlink://../../../../KymoCore`, Branch
-`feat/live-variables`).
+Das Beispiel verwendet das offizielle KymoCore-Release 7.3.0 aus dem gepinnten
+Submodul `lib/KymoCore`. Ein benachbarter Entwicklungscheckout wird nicht benötigt.

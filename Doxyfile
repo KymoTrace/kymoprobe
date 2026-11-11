@@ -1,19 +1,31 @@
-PROJECT_NAME           = KymoCore
+PROJECT_NAME           = KymoProbe
 PROJECT_BRIEF          = "Portable embedded telemetry: configuration, Init and cyclic Main"
 OUTPUT_DIRECTORY       = docs/api
 INPUT                  = docs/api.dox \
-                         lib/KymoCore/src/kymo_build_config.h \
-                         lib/KymoCore/src/kymo_features.h \
-                         lib/KymoCore/src/kymo_version.h \
-                         lib/KymoCore/src/kymo_instrumentation.h \
-                         lib/KymoCore/src/kymo_runtime.h \
-                         lib/KymoCore/src/kymo_protocol.h \
-                         lib/KymoCore/src/kymo.h \
-                         lib/KymoCore/src/kymo_stream.h \
                          lib/KymoCore/src/common/embedded_bits.h \
                          lib/KymoCore/src/common/embedded_bytes.h \
                          lib/KymoCore/src/common/embedded_crc.h \
-                         include/kymo_config.h \
+                         lib/KymoCore/src/control/kymo_control_rx.h \
+                         lib/KymoCore/src/control/kymo_param.h \
+                         lib/KymoCore/src/control/kymo_watch.h \
+                         lib/KymoCore/src/endpoint/features/kymo_memory.h \
+                         lib/KymoCore/src/endpoint/features/kymo_param.h \
+                         lib/KymoCore/src/endpoint/features/kymo_plot.h \
+                         lib/KymoCore/src/endpoint/features/kymo_trace.h \
+                         lib/KymoCore/src/endpoint/features/kymo_watch.h \
+                         lib/KymoCore/src/endpoint/kymo_endpoint.h \
+                         lib/KymoCore/src/kymo_config.h \
+                         lib/KymoCore/src/kymo_types.h \
+                         lib/KymoCore/src/KymoCore.h \
+                         lib/KymoCore/src/telemetry/kymo_memory.h \
+                         lib/KymoCore/src/telemetry/kymo_protocol.h \
+                         lib/KymoCore/src/telemetry/kymo_runtime.h \
+                         lib/KymoCore/src/telemetry/kymo_sender.h \
+                         lib/KymoCore/src/trace/kymo_instrumentation.h \
+                         lib/KymoCore/src/trace/kymo_trace.h \
+                         lib/KymoCore/src/trace/kymo_trace_protocol.h \
+                         lib/KymoCore/src/transport/kymo_mux.h \
+                         lib/KymoCore/src/transport/kymo_tx.h \
                          include/demo_selection.h \
                          examples/common/arduino_serial_config.h \
                          examples/common/kymo_arduino.h \
@@ -25,12 +37,24 @@ INPUT                  = docs/api.dox \
                          examples/esp32/runtime_freertos/include/Config.h \
                          examples/esp32/runtime_freertos/include/Types.h \
                          examples/stm32/adapters/kymo_stm32.h \
-                         examples/stm32/uart_example/src/board.h
+                         examples/stm32/uart_example/src/board.h \
+                         examples/integration/include/app_values.h \
+                         examples/integration/include/features/kymo_memory.h \
+                         examples/integration/include/features/kymo_param.h \
+                         examples/integration/include/features/kymo_plot.h \
+                         examples/integration/include/features/kymo_trace.h \
+                         examples/integration/include/features/kymo_watch.h \
+                         examples/integration/include/kymo_init.h \
+                         examples/integration/include/kymo_port.h \
+                         examples/integration/include/kymo_user_config.h
 FILE_PATTERNS          = *.h *.dox
 RECURSIVE              = NO
 EXTRACT_ALL            = NO
 EXTRACT_PRIVATE        = YES
 EXTRACT_STATIC         = YES
+# Opaque recorder storage and macro-expansion helpers are not application APIs.
+# Keep the released Core checkout unchanged; document its callable interfaces.
+EXCLUDE_SYMBOLS        = KYMO_TRACE_DETAIL_* __COUNTER__ KYMO_TRACE_SCOPE_IMPL
 HIDE_UNDOC_MEMBERS     = NO
 HIDE_UNDOC_CLASSES     = NO
 FULL_PATH_NAMES        = YES
@@ -47,7 +71,9 @@ PREDEFINED            = __cplusplus DOXYGEN HAL_UART_MODULE_ENABLED \
                          KYMO_ENABLE_RUNTIME=1 KYMO_ENABLE_X=1 KYMO_ENABLE_Z=1 \
                          KYMO_ENABLE_TIMESTAMP=1 KYMO_ENABLE_CRC=1 \
                          KYMO_ENABLE_DECODER=1 KYMO_ENABLE_CPP=1 \
-                         KYMO_ENABLE_TRACE=0 KYMO_ENABLE_TRACE_ISR=0 \
+                         KYMO_ENABLE_ENDPOINT=1 KYMO_ENABLE_TX=1 \
+                         KYMO_ENABLE_PARAMETERS=1 KYMO_ENABLE_WATCH=1 KYMO_ENABLE_MEMORY=1 \
+                         KYMO_ENABLE_TRACE=1 KYMO_ENABLE_TRACE_ISR=0 \
                          KYMO_ENABLE_TRACE_SCHEDULER=0 KYMO_ENABLE_TRACE_FLOW=0
 QUIET                 = YES
 WARNINGS              = YES

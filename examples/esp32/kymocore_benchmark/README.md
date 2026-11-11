@@ -27,5 +27,5 @@ Die Tabellen kosten auf Cortex-M4 244 B (CRC-8) und 486 B (CRC-16) Flash
 einzelne Ausreißer glättet der Mittelwert.
 
 Die gemessenen Werte gehören danach in den KymoCore-GUIDE und auf die Website.
-Bis KymoCore 7.3.0 getaggt ist, baut das Beispiel gegen den KymoCore-Checkout neben
-KymoProbe (`lib_deps = KymoCore=symlink://../../../../KymoCore`, Branch `develop`).
+Das Beispiel verwendet das offizielle KymoCore-Release 7.3.0 aus dem gepinnten
+Submodul `lib/KymoCore`. Ein benachbarter Entwicklungscheckout wird nicht benötigt.

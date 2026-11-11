@@ -24,6 +24,11 @@
 
 ---
 
+Das [vollständige Endpoint-Beispiel](examples/integration/README.md) zeigt die aktuelle
+modulare Integration mit Plot, Parameter, Watch, Memory und Trace. Alle Beispiele
+nutzen das gepinnte KymoCore-Release 7.3.0. KymoProbe-Tags tragen künftig exakt
+dieselbe Versionsnummer; siehe [Release-Regeln](docs/releases.md).
+
 ## Worum geht es?
 
 KymoProbe ist der schnellste Weg von einem Mikrocontroller zu **live

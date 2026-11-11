@@ -26,8 +26,8 @@
  * @endcode
  *
  * @section modules API areas
- * - Edit kymo_build_config.h to set features to 0/1; kymo_features.h validates
- *   them. Compiler definitions override the header. Defaults enable scalar encoding
+ * - Pass build-wide feature definitions or KYMO_USER_CONFIG_HEADER; kymo_config.h
+ *   validates them. Keep the release submodule unchanged. Defaults enable scalar encoding
  *   and Init/Main only; X/Z/time, CRC, MCU decoding and C++ are opt-in.
  * - @ref kymo_runtime describes configuration, callbacks and runtime state.
  * - See the module index for the wire codec, common byte/bit/CRC operations,
@@ -48,6 +48,102 @@
  * KymoCore has no Arduino or STM32 SDK dependencies. Hardware adapters belong
  * to examples/application code. Headers under legacy and the independent Events
  * dependency are outside this API. The binary v6 wire format remains compatible
- * with KymoStudio; see lib/KymoCore/PROTOCOL.md in the repository.
+ * with KymoStudio; see lib/KymoCore/docs/PROTOCOL.md in the repository.
  * Documentation and single-exit style do not constitute safety certification.
+ */
+
+/* The released recorder exposes storage for static allocation. These members
+ * are implementation state, not configurable Probe bindings. Document that
+ * contract here without modifying the pinned third-party release checkout. */
+/** @var KymoTraceContextState::id
+ * @brief Internal recorder state; managed exclusively by KymoTrace APIs.
+ * @details Do not read or modify this member from the application.
+ */
+/** @var KymoTraceContextState::sequence
+ * @brief Internal recorder state; managed exclusively by KymoTrace APIs.
+ * @details Do not read or modify this member from the application.
+ */
+/** @var KymoTraceContextState::depth
+ * @brief Internal recorder state; managed exclusively by KymoTrace APIs.
+ * @details Do not read or modify this member from the application.
+ */
+/** @var KymoTraceContextState::allocated
+ * @brief Internal recorder state; managed exclusively by KymoTrace APIs.
+ * @details Do not read or modify this member from the application.
+ */
+/** @var KymoTraceContextState::invalid
+ * @brief Internal recorder state; managed exclusively by KymoTrace APIs.
+ * @details Do not read or modify this member from the application.
+ */
+/** @var KymoTraceContextState::depth_overflow
+ * @brief Internal recorder state; managed exclusively by KymoTrace APIs.
+ * @details Do not read or modify this member from the application.
+ */
+/** @var KymoTraceContextState::symbols
+ * @brief Internal recorder state; managed exclusively by KymoTrace APIs.
+ * @details Do not read or modify this member from the application.
+ */
+/** @var KymoTraceRecorder::config
+ * @brief Internal recorder state; managed exclusively by KymoTrace APIs.
+ * @details Do not read or modify this member from the application.
+ */
+/** @var KymoTraceRecorder::rings
+ * @brief Internal recorder state; managed exclusively by KymoTrace APIs.
+ * @details Do not read or modify this member from the application.
+ */
+/** @var KymoTraceRecorder::contexts
+ * @brief Internal recorder state; managed exclusively by KymoTrace APIs.
+ * @details Do not read or modify this member from the application.
+ */
+/** @var KymoTraceRecorder::record_seq
+ * @brief Internal recorder state; managed exclusively by KymoTrace APIs.
+ * @details Do not read or modify this member from the application.
+ */
+/** @var KymoTraceRecorder::drops
+ * @brief Internal recorder state; managed exclusively by KymoTrace APIs.
+ * @details Do not read or modify this member from the application.
+ */
+/** @var KymoTraceRecorder::errors
+ * @brief Internal recorder state; managed exclusively by KymoTrace APIs.
+ * @details Do not read or modify this member from the application.
+ */
+/** @var KymoTraceRecorder::producer_next
+ * @brief Internal recorder state; managed exclusively by KymoTrace APIs.
+ * @details Do not read or modify this member from the application.
+ */
+/** @var KymoTraceRecorder::settled_through
+ * @brief Internal recorder state; managed exclusively by KymoTrace APIs.
+ * @details Do not read or modify this member from the application.
+ */
+/** @var KymoTraceRecorder::high_water
+ * @brief Internal recorder state; managed exclusively by KymoTrace APIs.
+ * @details Do not read or modify this member from the application.
+ */
+/** @var KymoTraceRecorder::heads
+ * @brief Internal recorder state; managed exclusively by KymoTrace APIs.
+ * @details Do not read or modify this member from the application.
+ */
+/** @var KymoTraceRecorder::counts
+ * @brief Internal recorder state; managed exclusively by KymoTrace APIs.
+ * @details Do not read or modify this member from the application.
+ */
+/** @var KymoTraceRecorder::initialized
+ * @brief Internal recorder state; managed exclusively by KymoTrace APIs.
+ * @details Do not read or modify this member from the application.
+ */
+/** @var KymoTraceRecorder::pop_core
+ * @brief Internal recorder state; managed exclusively by KymoTrace APIs.
+ * @details Do not read or modify this member from the application.
+ */
+/** @var KymoTraceScope::m_recorder
+ * @brief Internal recorder state; managed exclusively by KymoTrace APIs.
+ * @details Do not read or modify this member from the application.
+ */
+/** @var KymoTraceScope::m_context
+ * @brief Internal recorder state; managed exclusively by KymoTrace APIs.
+ * @details Do not read or modify this member from the application.
+ */
+/** @var KymoTraceScope::m_symbol
+ * @brief Internal recorder state; managed exclusively by KymoTrace APIs.
+ * @details Do not read or modify this member from the application.
  */

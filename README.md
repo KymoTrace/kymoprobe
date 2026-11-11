@@ -103,6 +103,13 @@ time instead of silently ignoring the production setting.
 
 ## What is included
 
+For the current modular API, start with the
+[complete Endpoint example](examples/integration/README.md): separate Plot,
+Parameter, Watch, Memory and Trace files with explicit configuration and Init
+calls, plus one shared Main. It builds for ESP32 and Uno (Trace disabled on Uno).
+All examples use the pinned KymoCore release. KymoProbe release tags match its
+version exactly; see [versioning and releases](docs/releases.md).
+
 | Example | Hardware | Shows |
 |---|---|---|
 | [Main project](src/) | ESP32 (NodeMCU-32S) | minimal configuration over UART |
