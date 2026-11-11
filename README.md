@@ -18,7 +18,7 @@
 
 <p align="center">
   <img alt="License MIT" src="https://img.shields.io/badge/License-MIT-15123A">
-  <img alt="KymoCore 7.2.1" src="https://img.shields.io/badge/KymoCore-7.2.1-7C5CFF">
+  <img alt="KymoCore 7.3.0" src="https://img.shields.io/badge/KymoCore-7.3.0-7C5CFF">
   <img alt="PlatformIO" src="https://img.shields.io/badge/PlatformIO-ESP32%20%C2%B7%20AVR%20%C2%B7%20STM32-FDE047">
 </p>
 
@@ -156,7 +156,7 @@ capability details.
 
 - **[Manual](docs/MANUAL.md):** setup, examples, architecture, C/C++ API and checks
 - **[KymoCore guide](https://github.com/KymoTrace/kymocore/blob/main/docs/GUIDE.md):** configuration, features, transports
-- **[Protocol](https://github.com/KymoTrace/kymocore/blob/main/PROTOCOL.md):** byte layout of the frames
+- **[Protocol](https://github.com/KymoTrace/kymocore/blob/main/docs/PROTOCOL.md):** byte layout of the frames
 - **[Examples in detail](examples/README.md)** · **[Verification results](docs/verification.md)** (German) · **[Contributing](CONTRIBUTING.md)**
 
 ## License

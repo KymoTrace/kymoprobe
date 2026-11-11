@@ -18,7 +18,7 @@
 
 <p align="center">
   <img alt="Lizenz MIT" src="https://img.shields.io/badge/Lizenz-MIT-15123A">
-  <img alt="KymoCore 7.2.1" src="https://img.shields.io/badge/KymoCore-7.2.1-7C5CFF">
+  <img alt="KymoCore 7.3.0" src="https://img.shields.io/badge/KymoCore-7.3.0-7C5CFF">
   <img alt="PlatformIO" src="https://img.shields.io/badge/PlatformIO-ESP32%20%C2%B7%20AVR%20%C2%B7%20STM32-FDE047">
 </p>
 
@@ -140,7 +140,7 @@ Alle Beispiele sind gebaut und geprüft; die wichtigsten baut die CI bei jedem P
 
 - **[Handbuch](docs/MANUAL.de.md):** Einrichtung, Beispiele, Architektur, C-/C++-API und Prüfung
 - **[KymoCore-Anleitung](https://github.com/KymoTrace/kymocore/blob/main/docs/GUIDE.de.md):** Konfiguration, Features, Transporte
-- **[Protokoll](https://github.com/KymoTrace/kymocore/blob/main/PROTOCOL.md):** Byte-Aufbau der Frames
+- **[Protokoll](https://github.com/KymoTrace/kymocore/blob/main/docs/PROTOCOL.md):** Byte-Aufbau der Frames
 - **[Beispiele im Detail](examples/README.md)** · **[Prüfergebnisse](docs/verification.md)** · **[Mitmachen](CONTRIBUTING.de.md)**
 
 ## Lizenz

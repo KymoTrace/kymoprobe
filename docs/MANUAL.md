@@ -65,7 +65,7 @@ rules.
 
 [KymoCore](https://github.com/KymoTrace/kymocore/blob/main/docs/GUIDE.md)
 (separate repository, submodule) documents the configuration, memory and
-callback contracts. [PROTOCOL.md](https://github.com/KymoTrace/kymocore/blob/main/PROTOCOL.md)
+callback contracts. [PROTOCOL.md](https://github.com/KymoTrace/kymocore/blob/main/docs/PROTOCOL.md)
 defines the wire format, identical to KymoStudio. It uses 9–21 bytes per
 measurement: byte-based IDs/flags, explicit little endian, float32, optional
 uint32 milliseconds and a trailing byte. CRC8 is disabled by default; `NO_CRC`

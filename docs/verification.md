@@ -44,7 +44,7 @@ Nicht Bestandteil dieser Prüfung: Upload in die Registry, Registry-Rendering,
 Prüfung des verfügbaren Owner-/Versionsnamens, elektrische Boardtests oder die
 komplette App-Testsuite. Der App-Abgleich verwendet den lokalen Nachbarcheckout,
 nicht den öffentlich verfügbaren GitHub-Stand. Die Hinweise in
-`lib/KymoCore/PUBLISHING.md` beschreiben die verbleibenden Release-Schritte.
+`lib/KymoCore/docs/PUBLISHING.md` beschreiben die verbleibenden Release-Schritte.
 
 ## Historischer Prüfstand vom 30.09.2026
 

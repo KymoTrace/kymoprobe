@@ -61,7 +61,7 @@ Die vollständige Header-API lässt sich mit `doxygen Doxyfile` erzeugen.
 [Doxygen-Anleitung](doxygen.md) beschreibt Ausgabe und Dokumentationsregeln.
 
 [KymoCore](https://github.com/KymoTrace/kymocore/blob/main/docs/GUIDE.de.md) (eigenes Repository, Submodul) dokumentiert die Konfiguration, Speicher-
-und Callback-Verträge. [PROTOCOL.md](https://github.com/KymoTrace/kymocore/blob/main/PROTOCOL.md) definiert das
+und Callback-Verträge. [PROTOCOL.md](https://github.com/KymoTrace/kymocore/blob/main/docs/PROTOCOL.md) definiert das
 mit KymoStudio identische Wire-Format. Es sind 9–21 Bytes pro Messung:
 bytebasierte IDs/Flags, explizites Little Endian, float32, optionale uint32-
 Millisekunden und ein Abschlussbyte. CRC8 ist standardmäßig deaktiviert;
