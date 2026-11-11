@@ -37,12 +37,17 @@ def compile_demo(executable: Path, snapshot: Path) -> None:
     command = [
         "g++", "-std=c++11", "-Wall", "-Wextra", "-Werror", "-pedantic",
         "-fno-exceptions", "-fno-rtti", "-I" + str(CORE),
+        "-DKYMO_ENABLE_ENDPOINT=1", "-DKYMO_ENABLE_TX=1",
         "-I" + str(snapshot),
         "-DKYMO_USER_CONFIG_HEADER=\"kymo_user_config.h\"",
         str(ROOT / "test/native/trace_demo.cpp"),
         str(CORE / "trace/kymo_trace.cpp"),
         str(CORE / "trace/kymo_trace_protocol.cpp"),
-        str(CORE / "transport/kymo_mux.cpp"), "-o", str(executable),
+        str(CORE / "transport/kymo_mux.cpp"),
+        str(CORE / "transport/kymo_tx.cpp"),
+        *map(str, (CORE / "endpoint").rglob("*.cpp")),
+        str(CORE / "telemetry/kymo_runtime.cpp"),
+        str(CORE / "telemetry/kymo_protocol.cpp"), "-o", str(executable),
     ]
     subprocess.run(command, cwd=ROOT, check=True)
 
@@ -101,7 +106,26 @@ def main() -> None:
         capture = Path(directory) / "trace.ktr"
         with capture.open("wb") as stream:
             subprocess.run([str(executable)], cwd=ROOT, stdout=stream, check=True)
-        frames = decode_stream(capture.read_bytes())
+        capture_bytes = capture.read_bytes()
+        frames = decode_stream(capture_bytes)
+    # A receiver attaching after startup must recover from a repeated pair.
+    raw = capture_bytes
+    starts = []
+    offset = 0
+    while offset < len(raw):
+        length = 24 + int.from_bytes(raw[offset + 4:offset + 6], "little")
+        if raw[offset + 3] == 1 and int.from_bytes(raw[offset + 36:offset + 40], "little") == 0:
+            starts.append(offset)
+        offset += length
+    assert len(starts) >= 3, "expected startup and two metadata refreshes"
+    late = TraceSessionStore()
+    for frame in decode_stream(raw[starts[1]:]):
+        late.ingest(frame)
+    late_session = next(iter(late.sessions.values()))
+    assert late_session.metadata.get("wire_version") == 2
+    assert late_session.dictionary.get("generation") == 1
+    assert late_session.spans and late_session.markers
+    print("Late-attach metadata recovery: PASS")
     store = TraceSessionStore()
     for frame in frames:
         store.ingest(frame)

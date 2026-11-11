@@ -14,6 +14,7 @@ static const uint32_t TRACE_CONTEXT_ID = 1u;
 static const uint16_t TRACE_MARKER_ID = 1u;
 static const uint32_t TRACE_RECORD_GENERATION = 1u;
 static const uint32_t TRACE_MARKER_PERIOD_MS = 200u;
+static const uint32_t TRACE_METADATA_PERIOD_TICKS = 5000u; /* 1 kHz clock. */
 /*******************************************************************************
  * kymoTraceConfig
  ******************************************************************************/
@@ -28,6 +29,7 @@ KymoEndpointTraceConfig kymoTraceConfig(void)
     config.dictionary = exampleTraceDictionary;
     config.dictionary_length = sizeof(exampleTraceDictionary) - 1u;
     config.generation = TRACE_RECORD_GENERATION;
+    config.metadata_period_ticks = TRACE_METADATA_PERIOD_TICKS;
     return config;
 }
 /*******************************************************************************

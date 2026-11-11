@@ -110,6 +110,16 @@ jobs:
             environment: esp32dev
           - project: examples/integration
             environment: uno
+          - project: examples/esp32/measurement_signals
+            environment: esp32-measurement-signals
+          - project: examples/esp32/runtime_freertos
+            environment: esp32-runtime-test
+          - project: examples/esp32/task_trace_example
+            environment: esp32-runtime-test
+          - project: examples/native
+            environment: native
+          - project: examples/stm32/usb_cdc_example
+            environment: bluepill_f103c8
           - project: examples/esp32/trace_uart
             environment: esp32-trace
           - project: examples/stm32/uart_example

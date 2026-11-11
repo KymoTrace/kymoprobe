@@ -28,6 +28,7 @@
 #include "stm32f4xx_hal.h"
 #endif
 #include <KymoCore.h>
+#include <probe/kymo_init.h>
 #if KYMO_CONFIG_API_VERSION != 2
 #error "KymoProbe STM32 example requires KymoCore configuration API version 2"
 #endif
@@ -38,19 +39,12 @@
  * @details Input/output HAL state initialized by uart_init in main.c. The interrupt handler
  * updates transfer state; the configured busy callback prevents premature buffer reuse.
  * @par Usage
- * Initialize before Kymo_Init and forward USART2 IRQ to HAL_UART_IRQHandler(&huart2).
+ * Initialize before probeCoreInit and forward USART2 IRQ to HAL_UART_IRQHandler(&huart2).
  */
 extern UART_HandleTypeDef huart2;
 
-/**
- * @brief Persistent C/HAL channel and callback configuration.
- *
- * @details Input to Kymo_Init; binds interrupt-driven UART writes and the HAL millisecond clock.
- * Its pointed-to scheduling state is owned by the application and modified by the runtime.
- * @par Usage
- * Kymo_Init(&kymo, &example_config);
- */
-extern const KymoConfig example_config;
+/** @brief Build HAL callbacks. @return Port settings without owned buffers. */
+KymoEndpointConfig kymoPortConfig(void);
 
 /** @} */
 #endif /* EXAMPLE_BOARD_H */

@@ -1,10 +1,12 @@
 /* SPDX-License-Identifier: MIT
  * Copyright (c) 2026 Christof Seidel */
 #include "board.h"
+#include "kymo_plot.h"
 
 #if KYMO_EFFECTIVE_RUNTIME
 UART_HandleTypeDef huart2;
-static KymoContext kymo;
+static ProbeCore core;
+static KymoEndpointPlot plot;
 
 /*******************************************************************************
  * SysTick_Handler
@@ -52,8 +54,12 @@ int main(void) {
     HAL_Init();
 #if KYMO_EFFECTIVE_RUNTIME
     uart_init();
-    if (Kymo_Init(&kymo, &example_config) != KYMO_OK) while (1) {}
-    while (1) { (void)Kymo_Main(&kymo); }
+    const KymoEndpointConfig port = kymoPortConfig();
+    const KymoEndpointPlotConfig config = kymoPlotConfig();
+    KymoStatus status = probeCoreInit(&core, &port);
+    if (status == KYMO_OK) { status = KymoEndpointPlot_Init(&core.endpoint, &plot, &config); }
+    if (status != KYMO_OK) { while (1) {} }
+    while (1) { (void)KymoEndpoint_Main(&core.endpoint); }
 #else
     while (1) {}
 #endif

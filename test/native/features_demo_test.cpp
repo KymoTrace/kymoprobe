@@ -11,6 +11,7 @@ bool testIsBlocked = true;
 std::vector<uint8_t> testWire;
 TestSerial Serial;
 
+#include "../../src/features/feature/kymo_plot.cpp"
 #include "../../src/features_demo.cpp"
 #include "../../src/main.cpp"
 
@@ -39,8 +40,9 @@ int main(void)
         ++testClockMs;
         loop();
     }
-    while (featureSender.flush() != KYMO_OK) {
-    }
+    assert(KymoEndpoint_RequestStop(&featureCore.endpoint) == KYMO_OK);
+    for (uint32_t drain = 0u; drain < 1000u && KymoEndpoint_Main(&featureCore.endpoint) != KYMO_IDLE; ++drain) {}
+    assert(featureCore.endpoint.phase == KYMO_ENDPOINT_STOPPED);
     while (position < testWire.size()) {
         assert(testWire.size() - position >= 3u);
         length = KymoProtocol_FrameLength(testWire[position + 2u]);

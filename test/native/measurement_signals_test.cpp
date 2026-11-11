@@ -1,44 +1,64 @@
-/* SPDX-License-Identifier: MIT
- * Copyright (c) 2026 Christof Seidel */
-/** @file measurement_signals_test.cpp @brief Emit actual fixture codec frames.
- * @details Cross-language test: the Studio decoder consumes the output file. */
+/* SPDX-License-Identifier: MIT */
+/** @file measurement_signals_test.cpp @brief Actual Endpoint waveform binding test. */
 #include <stdio.h>
-#include <stdint.h>
-#include <KymoCore.h>
-#include "Waveforms.h"
-
-/** @brief Generate exactly 2048 sample instants of all channels.
- * @param[in] argc Argument count. @param[in] argv Output filename in argv[1].
- * @return Zero on success, one for file or codec errors. */
+#include <assert.h>
+#include <endpoint/kymo_endpoint.h>
+#include <endpoint/features/kymo_plot.h>
+#include "kymo_plot.h"
+#include "Config.h"
+static uint32_t clockMs;
+static FILE *output;
+static bool blocked;
+/*******************************************************************************
+ * probeSerialClock
+ ******************************************************************************/
+uint32_t probeSerialClock(void *user)
+{
+    (void)user;
+    return clockMs;
+}
+/*******************************************************************************
+ * writeBytes
+ ******************************************************************************/
+static size_t writeBytes(void *user, const uint8_t *bytes, size_t length)
+{
+    size_t accepted = 0u;
+    const size_t CHUNK_BYTES = 3u;
+    (void)user;
+    if (!blocked) { accepted = fwrite(bytes, 1u, length < CHUNK_BYTES ? length : CHUNK_BYTES, output); }
+    return accepted;
+}
 /*******************************************************************************
  * main
  ******************************************************************************/
-int32_t main(int32_t argc, char **argv)
+int main(int argc, char **argv)
 {
-    FILE *output = nullptr;
-    int32_t result = 1;
-    bool isValid = true;
-    KymoDataPoint point = {};
-    uint8_t bytes[KYMO_FRAME_MAX_SIZE] = {};
-    size_t length = 0u;
-    if ((argc == 2) && (argv != nullptr) && (argv[1] != nullptr)) {
-        output = fopen(argv[1], "wb");
-    }
-    if (output != nullptr) {
-        for (uint32_t sampleIndex = 0u; sampleIndex < 2048u; ++sampleIndex) {
-            const MeasurementSet_T set = calculateMeasurementSet(sampleIndex * SAMPLE_PERIOD_MS);
-            point.flags = KYMO_FLAG_TIMESTAMP;
-            point.timestamp_ms = set.timestampMs;
-            for (uint32_t channel = 0u; channel < MEASUREMENT_CHANNEL_COUNT; ++channel) {
-                point.id = static_cast<uint8_t>(channel);
-                point.value = set.values[channel];
-                length = KymoProtocol_Encode(&point, bytes, sizeof(bytes));
-                isValid = (length != 0u) && isValid;
-                isValid = (fwrite(bytes, 1u, length, output) == length) && isValid;
-            }
+    KymoEndpoint endpoint = {};
+    KymoEndpointPlot plot = {};
+    KymoEndpointConfig port = {};
+    uint8_t buffer[KYMO_FRAME_MAX_SIZE] = {};
+    assert(argc >= 2);
+    output = fopen(argv[1], "wb");
+    assert(output != nullptr);
+    const KymoEndpointPlotConfig config = kymoPlotConfig();
+    port.clock_ms = kymoPlotClock;
+    port.tx.buffer = buffer;
+    port.tx.capacity = sizeof(buffer);
+    port.tx.write = writeBytes;
+    assert(KymoEndpoint_Init(&endpoint, &port) == KYMO_OK);
+    assert(KymoEndpointPlot_Init(&endpoint, &plot, &config) == KYMO_OK);
+    for (uint32_t index = 0u; index < 2048u; ++index) {
+        clockMs = index * SAMPLE_PERIOD_MS;
+        blocked = argc > 2 && index >= 512u && index < 562u;
+        for (uint32_t turn = 0u; turn < 80u; ++turn) {
+            (void)KymoEndpoint_Main(&endpoint);
         }
-        isValid = (fclose(output) == 0) && isValid;
-        result = isValid ? 0 : 1;
     }
-    return result;
+    assert(KymoEndpoint_RequestStop(&endpoint) == KYMO_OK);
+    for (uint32_t turn = 0u; turn < 1000u && endpoint.phase != KYMO_ENDPOINT_STOPPED; ++turn) {
+        (void)KymoEndpoint_Main(&endpoint);
+    }
+    assert(endpoint.phase == KYMO_ENDPOINT_STOPPED);
+    assert(fclose(output) == 0);
+    return 0;
 }

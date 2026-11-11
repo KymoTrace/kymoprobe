@@ -10,7 +10,7 @@ import re
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
-SCOPE = ("src", "include", "lib/KymoCore/src", "lib/KymoCore/test", "lib/KymoCore/examples",
+SCOPE = ("lib/ProbeEndpoint", "src", "include", "lib/KymoCore/src", "lib/KymoCore/test", "lib/KymoCore/examples",
          "examples", "test/native")
 EXTENSIONS = {".c", ".h", ".cpp", ".ino", ".hpp"}
 LEXEME = re.compile(

@@ -16,12 +16,15 @@ def main():
     core = ROOT / "lib/KymoCore/src"
     executable = output / "features_demo.exe"
     command = ["g++", "-std=c++11", "-Wall", "-Wextra", "-Werror", "-pedantic",
-               "-fno-exceptions", "-fno-rtti", "-DKYMO_DEMO_MODE=KYMO_DEMO_FEATURES",
+               "-fno-exceptions", "-fno-rtti", "-DKYMO_ENABLE_ENDPOINT=1", "-DKYMO_ENABLE_TX=1", "-DARDUINO=10800",
+                 "-I" + str(ROOT / "lib/ProbeEndpoint/src"), "-DKYMO_DEMO_MODE=KYMO_DEMO_FEATURES",
                "-include", str(ROOT / "include/demo_selection.h"),
                "-I" + str(ROOT / "include"), "-I" + str(ROOT / "test/stress_stub"),
                "-I" + str(core), str(ROOT / "test/native/features_demo_test.cpp"),
                str(core / "telemetry/kymo_sender.cpp"), str(core / "telemetry/kymo_protocol.cpp"),
-               str(core / "telemetry/kymo_runtime.cpp"), "-o", str(executable)]
+               str(core / "telemetry/kymo_runtime.cpp"), *[str(p) for p in sorted((ROOT / "lib/KymoCore/src/endpoint").rglob("*.cpp"))],
+               str(ROOT / "lib/KymoCore/src/transport/kymo_tx.cpp"),
+               *[str(p) for p in sorted((ROOT / "lib/ProbeEndpoint/src").glob("*.cpp"))], "-o", str(executable)]
     subprocess.run(command, cwd=ROOT, check=True)
     subprocess.run([str(executable)], cwd=ROOT, check=True)
     print("Feature firmware passed: central dispatch, XYZ/time, CRC rejection, "

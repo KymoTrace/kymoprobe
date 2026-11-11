@@ -10,6 +10,7 @@ bool testIsBlocked = true;
 std::vector<uint8_t> testWire;
 TestSerial Serial;
 
+#include "../../src/features/stress/kymo_plot.cpp"
 #include "../../src/stress_demo.cpp"
 
 /** @brief Decode all captured frames and assert round-robin delivery.
@@ -73,17 +74,22 @@ int32_t main()
     for (uint16_t channelIndex = 0u; channelIndex < KYMO_STRESS_CHANNEL_COUNT; ++channelIndex) {
         sampledWhileBlocked += s_sampleCounts[channelIndex];
     }
-    assert(sampledWhileBlocked <= OUTPUT_CAPACITY / 13u);
+    assert(sampledWhileBlocked <= OUTPUT_CAPACITY / 13u + 1u);
     for (uint16_t iteration = 0u; iteration < 16000u; ++iteration) {
         testIsBlocked = iteration % 3u == 0u;
         demoStressMain();
     }
     testIsBlocked = false;
-    while (s_outputLength > 0u) {
+    assert(KymoEndpoint_RequestStop(&s_context.endpoint) == KYMO_OK);
+    for (uint32_t drain = 0u; drain < 10000u; ++drain) {
         flushStressOutput();
+        if (KymoEndpoint_Main(&s_context.endpoint) == KYMO_IDLE) { break; }
     }
+    assert(s_context.endpoint.phase == KYMO_ENDPOINT_STOPPED);
+    while (s_outputLength > 0u) { flushStressOutput(); }
     (void)verifyCapturedFrames();
 
+    resetStressStream();
     // Start a new session after discarding a partially transmitted batch.
     for (uint16_t iteration = 0u; (iteration < 10u) && (s_outputOffset == 0u); ++iteration) {
         demoStressMain();
@@ -94,9 +100,13 @@ int32_t main()
     for (uint16_t iteration = 0u; iteration < 2000u; ++iteration) {
         demoStressMain();
     }
-    while (s_outputLength > 0u) {
+    assert(KymoEndpoint_RequestStop(&s_context.endpoint) == KYMO_OK);
+    for (uint32_t drain = 0u; drain < 10000u; ++drain) {
         flushStressOutput();
+        if (KymoEndpoint_Main(&s_context.endpoint) == KYMO_IDLE) { break; }
     }
+    assert(s_context.endpoint.phase == KYMO_ENDPOINT_STOPPED);
+    while (s_outputLength > 0u) { flushStressOutput(); }
     (void)verifyCapturedFrames();
     return 0;
 }

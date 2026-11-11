@@ -22,9 +22,13 @@ def main():
     library = ROOT/'lib/KymoCore/src'
     subprocess.run([compiler, '-std=c++11', '-Wall', '-Wextra', '-Werror',
                     '-DKYMO_ENABLE_TIMESTAMP=1', '-DKYMO_ENABLE_CRC=1',
+                    '-DKYMO_ENABLE_ENDPOINT=1', '-DKYMO_ENABLE_TX=1',
+                    '-I'+str(ROOT/'examples/esp32/measurement_signals/src'),
+                    '-I'+str(ROOT/'lib/ProbeEndpoint/src'),
                     '-I'+str(library), '-I'+str(ROOT/'examples/esp32/measurement_signals/include'),
                     str(ROOT/'test/native/measurement_signals_test.cpp'),
-                    str(library/'telemetry/kymo_protocol.cpp'), '-o', str(exe)], check=True)
+                    str(ROOT/'examples/esp32/measurement_signals/src/kymo_plot.cpp'),
+                    *map(str, library.rglob('*.cpp')), '-o', str(exe)], check=True)
     raw = build/'signals.bin'
     environment = {**os.environ, 'PATH': str(Path(compiler).parent)+os.pathsep+os.environ['PATH']}
     subprocess.run([str(exe), str(raw)], check=True, env=environment)
@@ -34,6 +38,13 @@ def main():
     assert all([t for t, _ in rows[key]] == [t for t, _ in rows[0]] for key in rows)
     for values in rows.values():
         assert all(abs(b[0]-a[0]-.001) < 1e-9 for a, b in zip(values, values[1:]))
+    stalled = build/'stalled.bin'
+    subprocess.run([str(exe), str(stalled), 'stall'], check=True, env=environment)
+    delayed = [decode_data_frame(frame) for frame in ProtocolStreamDecoder().feed(stalled.read_bytes())]
+    delayed_rows = {key: [p.timestamp for p in delayed if p.id == key] for key in range(4)}
+    assert all(ts == delayed_rows[0] for ts in delayed_rows.values())
+    assert any(b-a > .040 for a,b in zip(delayed_rows[0], delayed_rows[0][1:]))
+    print('Endpoint waveform timestamps and backpressure gaps: PASS')
     spectral = {'spectral': True, 'fft_size': 1024, 'window': 'rectangular', 'level': 0}
 
     def peaks(key, count):

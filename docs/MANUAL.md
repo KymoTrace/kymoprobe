@@ -33,8 +33,9 @@ pio run -e nodemcu-32s -t upload
 ```
 
 `src/uart_demo.cpp` initialises Serial at **115200 baud** and calls Init/Main.
-`examples/common/arduino_serial_config.h` contains channels, sampling intervals, the measurement
-function and the transport. In the example, channels 0 and 1 send sine/sawtooth
+`lib/ProbeEndpoint/src/kymo_plot.cpp` contains channels, sampling intervals, the measurement
+function. The separate Serial port is in `kymo_port_arduino.cpp`.
+In the example, channels 0 and 1 send sine/sawtooth
 at 50 Hz each with timestamps. Your own measurements go into the `example_sample`
 callback.
 
@@ -52,7 +53,7 @@ pio run -d examples/arduino/multi_sensor_example -e uno
 ```
 
 The examples generate reproducible test signals. In the shared
-`examples/common/arduino_serial_config.h`, `example_sample` can be replaced with
+`lib/ProbeEndpoint/src/kymo_plot.cpp`, `example_sample` can be replaced with
 `analogRead()` or your own sensor values. The second example shows Y, X/Y and
 X/Y/Z with independent sampling rates. Arduino Uno/Nano/Mega and ESP32 projects
 use the same C++11 core.

@@ -2,6 +2,39 @@ PROJECT_NAME           = KymoProbe
 PROJECT_BRIEF          = "Portable embedded telemetry: configuration, Init and cyclic Main"
 OUTPUT_DIRECTORY       = docs/api
 INPUT                  = docs/api.dox \
+                         examples/esp32/kymocore_benchmark/src/kymo_trace.h \
+                         examples/esp32/kymocore_benchmark/src/kymo_port.h \
+                         examples/esp32/kymocore_benchmark/src/kymo_plot.h \
+                         examples/esp32/kymocore_benchmark/src/kymo_memory.h \
+                         examples/esp32/live_variables/src/kymo_watch.h \
+                         examples/esp32/measurement_signals/src/kymo_plot.h \
+                         examples/esp32/memory_telemetry/src/kymo_memory.h \
+                         examples/esp32/pi_controller/src/kymo_plot.h \
+                         examples/esp32/pi_controller/src/kymo_param.h \
+                         examples/esp32/runtime_freertos/src/kymo_trace.h \
+                         examples/esp32/runtime_freertos/src/kymo_port.h \
+                         examples/esp32/stack_reserve/src/kymo_plot.h \
+                         examples/esp32/task_trace_example/src/kymo_trace.h \
+                         examples/esp32/task_trace_example/src/kymo_port.h \
+                         examples/esp32/text_signals/src/kymo_port.h \
+                         examples/esp32/text_signals/src/kymo_plot.h \
+                         examples/esp32/trace_uart/src/kymo_trace.h \
+                         examples/esp32/trace_uart/src/kymo_port.h \
+                         examples/esp32/wifi_mqtt_example/src/kymo_port.h \
+                         examples/esp32/wifi_mqtt_example/src/kymo_plot.h \
+                         examples/native/src/kymo_port.h \
+                         examples/native/src/kymo_plot.h \
+                         examples/stm32/uart_example/src/kymo_plot.h \
+                         src/features/trace/kymo_trace.h \
+                         src/features/trace/kymo_port.h \
+                         src/features/stress/kymo_plot.h \
+                         src/features/stress/Config.h \
+                         src/features/network/kymo_plot.h \
+                         src/features/generated/kymo_plot.h \
+                         src/features/feature/kymo_plot.h \
+                         lib/ProbeEndpoint/src/probe/kymo_port.h \
+                         lib/ProbeEndpoint/src/probe/kymo_plot.h \
+                         lib/ProbeEndpoint/src/probe/kymo_init.h \
                          lib/KymoCore/src/common/embedded_bits.h \
                          lib/KymoCore/src/common/embedded_bytes.h \
                          lib/KymoCore/src/common/embedded_crc.h \
@@ -27,7 +60,6 @@ INPUT                  = docs/api.dox \
                          lib/KymoCore/src/transport/kymo_mux.h \
                          lib/KymoCore/src/transport/kymo_tx.h \
                          include/demo_selection.h \
-                         examples/common/arduino_serial_config.h \
                          examples/common/kymo_arduino.h \
                          examples/esp32/measurement_signals/include/Config.h \
                          examples/esp32/measurement_signals/include/Types.h \

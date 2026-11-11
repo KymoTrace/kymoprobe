@@ -1,23 +1,33 @@
 /* SPDX-License-Identifier: MIT
  * Copyright (c) 2026 Christof Seidel */
-#define KYMO_EXAMPLE_MULTIDIMENSIONAL 1
-#include "../../common/arduino_serial_config.h"
+#include <Arduino.h>
+#include <probe/kymo_init.h>
+#include <probe/kymo_port.h>
+#include <probe/kymo_plot.h>
 
 #if KYMO_EFFECTIVE_RUNTIME
-static KymoContext kymo;
+static ProbeCore core;
+static KymoStatus status = KYMO_BAD_CONFIG;
 
 /*******************************************************************************
  * setup
  ******************************************************************************/
 void setup() {
     Serial.begin(115200);
-    (void)Kymo_Init(&kymo, &example_config);
+    const KymoEndpointConfig port = probeSerialConfig();
+    const KymoEndpointPlotConfig plot = probeWaveformConfig();
+    status = probeCoreInit(&core, &port);
+    if (status == KYMO_OK) { status = probeWaveformInit(&core.endpoint, &plot); }
 }
 
 /*******************************************************************************
  * loop
  ******************************************************************************/
-void loop() { (void)Kymo_Main(&kymo); }
+void loop() {
+    if ((status == KYMO_OK) || (status == KYMO_IDLE) || (status == KYMO_BUSY) || (status == KYMO_BAD_SAMPLE)) {
+        status = KymoEndpoint_Main(&core.endpoint);
+    }
+}
 #else
 /*******************************************************************************
  * setup

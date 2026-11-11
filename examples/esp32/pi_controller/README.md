@@ -31,25 +31,24 @@ static const KymoParameter params[] = {
 `KYMO_PARAM` nimmt den Variablennamen als Parameternamen. Mehr ist nicht nötig. Studio
 fragt beim Verbinden nach der Liste und füllt sein Parameter-Panel daraus.
 
-In `loop()` liest die Firmware ohne zu warten, was angekommen ist, und reicht es an
-`KymoParam_Feed` weiter. Danach sendet sie fällige Beschreibungen
-(`KymoParam_NextDescription`) und Rückmeldungen (`KymoParam_NextReadback`). Der Regler
-rechnet weiter mit denselben Variablen. Ein angenommener Wert wirkt ab dem nächsten
-Regelschritt.
+`kymo_param.cpp` konfiguriert und initialisiert die Parameter; `kymo_plot.cpp`
+bindet die Messkanäle an. `loop()` berechnet den Regler und ruft den gemeinsamen
+Endpoint auf. Dieser verarbeitet Empfang, Beschreibungen, Rückmeldungen und Versand.
+Ein angenommener Wert wirkt ab dem nächsten Regelschritt.
 
 Die Firmware hat das letzte Wort: Ein Sollwert von 95 °C liegt außerhalb von 20…90.
 Das Gerät behält dann den alten Wert und meldet ihn zurück, Studio zeigt „abgelehnt“.
 
 ## Bauen und ausprobieren
 
-Der Rückkanal braucht KymoCore 7.1; das Beispiel baut gegen das Submodul `lib/KymoCore`.
+Das Beispiel verwendet KymoCore 7.3.1; das Beispiel baut gegen das Submodul `lib/KymoCore`.
 
 ```bash
 pio run -d examples/esp32/pi_controller -t upload --upload-port COM4
 ```
 
 `kymostudio.json` enthält die Quelle (COM4, 115200 Baud) und zwei Diagramme:
-Temperatur mit Sollwert sowie Heizleistung mit der Rückkanal-Zeit.
+Temperatur mit Sollwert sowie Heizleistung mit der Endpoint-Zeit.
 
 Erwartung in KymoStudio:
 
@@ -58,5 +57,5 @@ Erwartung in KymoStudio:
 - `kp` von 0.2 auf 2.0: Die Temperatur erreicht den Sollwert schneller und schwingt
   über. Das Panel zeigt „bestätigt“.
 - `setpoint` auf 95: Das Gerät lehnt ab, das Panel zeigt „Gerät behält 45.0“.
-- Signal 3 bleibt im Bereich einiger Mikrosekunden. Der Rückkanal bremst den Regler
-  also nicht.
+- Signal 3 zeigt die maximale Laufzeit eines vollständigen Endpoint-Aufrufs in
+  Mikrosekunden, einschließlich Empfang und Versand. Auf dem Board messen.

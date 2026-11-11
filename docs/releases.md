@@ -42,3 +42,25 @@ procedure to stop, never use `-f`. Tag CI validates the same version relationshi
 normal branch CI checks the pinned dependency without demanding a new tag.
 The new checks apply to commits containing them; the preserved baseline is not
 rewritten to add CI or fix historical files.
+
+## 7.3.1 example migration
+
+The application examples now use Endpoint and separate feature bindings (`kymo_plot`,
+`kymo_param`, `kymo_watch`, `kymo_memory`, `kymo_trace`). `lib/ProbeEndpoint` owns
+base buffers and reusable Serial/waveform bindings; it is application code, not
+part of the portable Core package. Each main initializes only its selected features.
+Transport callbacks remain separate from sample/configuration tables. Native
+simulation has its own port. TCP/MQTT reconnects reset only after transport-owned
+bytes are quiescent.
+
+The text_signals example deliberately remains a text-protocol diagnostic.
+kymocore_benchmark deliberately measures low-level APIs without Endpoint overhead.
+Both now separate feature code and transport/reporting.
+
+Trace metadata and dictionaries repeat five seconds after the previous pair
+completes, using Core 7.3.1's optional metadata_period_ticks. Stable recorder pointers
+are cached before tasks/ISRs start; the main loop alone services Endpoint. Producers
+must be stopped before any future Endpoint stop/reinitialization. UART accepts
+bounded partial writes, including frames larger than the hardware FIFO.
+
+The original Probe v7.3.0 baseline remains unchanged.

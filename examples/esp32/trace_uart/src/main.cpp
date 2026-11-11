@@ -8,146 +8,42 @@
 #include <freertos/portmacro.h>
 #include <freertos/task.h>
 #include <KymoCore.h>
-#include <kymo_generated_config.h>
-#include <kymo_trace_ids.h>
-#include <kymo_trace_metadata.h>
 
-portMUX_TYPE traceMuxLock = portMUX_INITIALIZER_UNLOCKED;
-uint64_t traceSessionId = 0u;
+#include "kymo_trace.h"
+#include "kymo_port.h"
+#include <probe/kymo_init.h>
+static ProbeCore core;
+static KymoStatus status = KYMO_BAD_CONFIG;
+static const uint32_t ENDPOINT_TURNS_PER_LOOP = 8u;
+
+
+
+
 uint32_t loopCounter = 0u;
-uint8_t metadataStage = 0u;
-uint64_t metadataCycleStartTicks = 0u;
 
-/*******************************************************************************
- * traceClockTicks
- ******************************************************************************/
-extern "C" uint64_t traceClockTicks(void *user)
-{
-    uint64_t result = static_cast<uint64_t>(esp_timer_get_time());
-    (void)user;
-    return result;
-}
 
-/*******************************************************************************
- * traceCoreId
- ******************************************************************************/
-extern "C" uint8_t traceCoreId(void *user)
-{
-    uint8_t result = static_cast<uint8_t>(xPortGetCoreID());
-    (void)user;
-    return result;
-}
 
-/*******************************************************************************
- * traceCurrentContext
- ******************************************************************************/
-extern "C" uint32_t traceCurrentContext(void *user)
-{
-    uint32_t result = KYMO_CONTEXT_MAIN;
-    (void)user;
-    return result;
-}
 
-/*******************************************************************************
- * traceCriticalEnter
- ******************************************************************************/
-extern "C" void traceCriticalEnter(void *user)
-{
-    (void)user;
-    portENTER_CRITICAL(&traceMuxLock);
-}
 
-/*******************************************************************************
- * traceCriticalExit
- ******************************************************************************/
-extern "C" void traceCriticalExit(void *user)
-{
-    (void)user;
-    portEXIT_CRITICAL(&traceMuxLock);
-}
 
-/*******************************************************************************
- * traceWriteFrame
- ******************************************************************************/
-extern "C" size_t traceWriteFrame(void *user, const uint8_t *bytes,
-                                  size_t length)
-{
-    size_t result = 0u;
-    (void)user;
-    if ((bytes != nullptr) && (Serial.availableForWrite() >=
-                               static_cast<int>(length))) {
-        result = Serial.write(bytes, length);
-    }
-    return result;
-}
 
-/*******************************************************************************
- * traceIsBusy
- ******************************************************************************/
-extern "C" uint8_t traceIsBusy(void *user)
-{
-    uint8_t result = Serial.availableForWrite() <= 0 ? 1u : 0u;
-    (void)user;
-    return result;
-}
+
+
 
 /*******************************************************************************
  * traceInstrumentedWork
  ******************************************************************************/
 void traceInstrumentedWork(uint32_t iteration)
 {
-    KYMO_TRACE_SCOPE(&kymo_generated_trace_recorder, KYMO_CONTEXT_MAIN,
+    KYMO_TRACE_SCOPE(kymoTraceRecorder(), KYMO_CONTEXT_MAIN,
                      KYMO_SYMBOL_SIMULATED_WORK);
-    KYMO_TRACE_MARK(&kymo_generated_trace_recorder, KYMO_CONTEXT_MAIN,
+    KYMO_TRACE_MARK(kymoTraceRecorder(), KYMO_CONTEXT_MAIN,
                     KYMO_SYMBOL_ITERATION, iteration);
     for (volatile uint32_t step = 0u; step < 300u; ++step) {
         (void)step;
     }
 }
 
-/*******************************************************************************
- * traceQueueMetadata
- ******************************************************************************/
-void traceQueueMetadata(void)
-{
-    KymoStatus queued = KYMO_REJECTED;
-    if ((metadataStage == 0u) &&
-        ((traceClockTicks(nullptr) - metadataCycleStartTicks) >= 5000000u)) {
-        if (kymo_generated_trace_mux.admin_pending == 0u) {
-            queued = KymoMux_QueueAdmin(&kymo_generated_trace_mux,
-                KYMO_TRACE_PAYLOAD_SESSION_META,
-                1u, kymo_trace_session_metadata,
-                kymo_trace_session_metadata_length);
-            if (queued == KYMO_OK) {
-                metadataStage = 1u;
-            }
-        }
-    } else if ((metadataStage == 1u) &&
-               (kymo_generated_trace_mux.admin_pending == 0u)) {
-        queued = KymoMux_QueueAdmin(&kymo_generated_trace_mux,
-            KYMO_TRACE_PAYLOAD_DICTIONARY,
-            1u, kymo_trace_dictionary,
-            kymo_trace_dictionary_length);
-        if (queued == KYMO_OK) {
-            metadataStage = 2u;
-        }
-    } else if ((metadataStage == 2u) &&
-               (kymo_generated_trace_mux.admin_pending == 0u)) {
-        metadataStage = 3u;
-        metadataCycleStartTicks = traceClockTicks(nullptr);
-    } else if ((metadataStage == 3u) &&
-               ((traceClockTicks(nullptr) - metadataCycleStartTicks) >=
-                5000000u)) {
-        metadataStage = 0u;
-    }
-}
-/*******************************************************************************
- * kymo_trace_session_id
- ******************************************************************************/
-extern "C" uint64_t kymo_trace_session_id(void)
-{
-    return traceSessionId;
-}
 
 /*******************************************************************************
  * setup
@@ -155,11 +51,12 @@ extern "C" uint64_t kymo_trace_session_id(void)
 void setup(void)
 {
     Serial.begin(460800u);
-    traceSessionId = (static_cast<uint64_t>(esp_random()) << 32u) |
-        static_cast<uint64_t>(esp_random());
-    (void)kymo_generated_trace_init(nullptr);
-    metadataStage = 0u;
-    metadataCycleStartTicks = traceClockTicks(nullptr);
+    kymoTracePortInit();
+    const KymoEndpointConfig port = kymoPortConfig();
+    const KymoEndpointTraceConfig traceConfig = kymoTraceConfig();
+    status = probeCoreInit(&core, &port);
+    if (status == KYMO_OK) { status = kymoTraceInit(&core.endpoint, &traceConfig); }
+
 }
 
 /*******************************************************************************
@@ -167,10 +64,13 @@ void setup(void)
  ******************************************************************************/
 void loop(void)
 {
-    KYMO_TRACE_SCOPE(&kymo_generated_trace_recorder, KYMO_CONTEXT_MAIN,
+    const uint32_t LOOP_PERIOD_MS = 10u;
+    delay(LOOP_PERIOD_MS);
+    KYMO_TRACE_SCOPE(kymoTraceRecorder(), KYMO_CONTEXT_MAIN,
                      KYMO_SYMBOL_MAIN_LOOP);
     traceInstrumentedWork(loopCounter++);
-    kymo_generated_trace_service();
-    traceQueueMetadata();
+    for (uint32_t turn = 0u; turn < ENDPOINT_TURNS_PER_LOOP; ++turn) {
+        status = KymoEndpoint_Main(&core.endpoint);
+    }
     yield();
 }

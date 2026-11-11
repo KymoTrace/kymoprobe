@@ -11,7 +11,9 @@
 #if KYMO_DEMO_NETWORK_ENABLE && KYMO_EFFECTIVE_RUNTIME
 #include <Arduino.h>
 #include <WiFi.h>
-#include <math.h>
+#include <probe/kymo_init.h>
+#include "features/network/kymo_plot.h"
+#include <new>
 #include "network_secrets.h"
 #if KYMO_DEMO_MQTT_ENABLE
 #include <PubSubClient.h>
@@ -20,14 +22,16 @@ static const char MQTT_TOPIC[] = "kymotrace/demo/7c92e4a83f16/saw";
 static const char MQTT_CLIENT_ID[] = "kymo-7c92e4a83f16-board";
 static WiFiClient mqttSocket;
 static PubSubClient mqtt(mqttSocket);
-static KymoContext mqttContext;
+static ProbeCore mqttContext;
+static KymoEndpointPlot mqttPlot;
 static uint32_t lastMqttAttemptMs;
 #endif
 #if KYMO_DEMO_TCP_ENABLE
 static const uint16_t TCP_PORT = 2323u;
 static WiFiServer tcpServer(TCP_PORT);
 static WiFiClient tcpClient;
-static KymoContext tcpContext;
+static ProbeCore tcpContext;
+static KymoEndpointPlot tcpPlot;
 #endif
 static uint32_t lastStatusMs;
 static bool wasWifiConnected = false;
@@ -47,20 +51,6 @@ static uint32_t readClockMs(void *user)
 /** @brief Generate a waveform. @param[in] user Unused.
  * @param[in] id 2 selects sine, 3 sawtooth. @param[out] out Sample destination.
  * @return One when a sample was written, otherwise zero. */
-/*******************************************************************************
- * readSample
- ******************************************************************************/
-static uint8_t readSample(void *user, uint8_t id, KymoSample *out)
-{
-    uint8_t result = 0u;
-    const float phase = static_cast<float>(millis() % 2000u) / 2000.0f;
-    (void)user;
-    if (out != nullptr) {
-        out->value = id == 2u ? sinf(phase * 6.283185307f) : 2.0f * phase - 1.0f;
-        result = 1u;
-    }
-    return result;
-}
 
 #if KYMO_DEMO_TCP_ENABLE
 /** @brief Copy a TCP prefix. @param[in] user Unused.
@@ -69,27 +59,41 @@ static uint8_t readSample(void *user, uint8_t id, KymoSample *out)
 /*******************************************************************************
  * writeTcp
  ******************************************************************************/
-static uint8_t writeTcp(void *user, const uint8_t *bytes, uint8_t length)
+static size_t writeTcp(void *user, const uint8_t *bytes, size_t length)
 {
-    uint8_t written = 0u;
+    size_t written = 0u;
     (void)user;
     if ((bytes != nullptr) && tcpClient.connected()) {
-        written = static_cast<uint8_t>(tcpClient.write(bytes, length));
+        written = tcpClient.write(bytes, length);
     }
     return written;
 }
-static const KymoChannel tcpChannels[] = {{100u, 2u, KYMO_FLAG_TIMESTAMP}};
-static KymoConfig makeTcpConfig()
+/*******************************************************************************
+ * makeTcpConfig
+ ******************************************************************************/
+static KymoEndpointConfig makeTcpConfig()
 {
-    KymoConfig config = {};
-    config.channels = tcpChannels;
-    config.channel_count = 1u;
+    KymoEndpointConfig config = {};
     config.clock_ms = readClockMs;
-    config.sample = readSample;
-    config.write = writeTcp;
+    config.tx.write = writeTcp;
     return config;
 }
-static const KymoConfig tcpConfig = makeTcpConfig();
+static const KymoEndpointConfig tcpConfig = makeTcpConfig();
+/*******************************************************************************
+ * initializeTcpStream
+ ******************************************************************************/
+static KymoStatus initializeTcpStream(void)
+{
+    const KymoEndpointPlotConfig plot = networkPlotConfig(true);
+    KymoStatus status = KYMO_BAD_CONFIG;
+    tcpContext.~ProbeCore();
+    new (&tcpContext) ProbeCore{};
+    tcpPlot.~KymoEndpointPlot();
+    new (&tcpPlot) KymoEndpointPlot{};
+    status = probeCoreInit(&tcpContext, &tcpConfig);
+    if (status == KYMO_OK) { status = KymoEndpointPlot_Init(&tcpContext.endpoint, &tcpPlot, &plot); }
+    return status;
+}
 
 /** @brief Accept one client and reset new streams to a complete frame. */
 /*******************************************************************************
@@ -104,7 +108,7 @@ static void serviceTcp(void)
             tcpClient = tcpServer.available();
             (void)tcpClient.setNoDelay(true);
             (void)tcpClient.setTimeout(1u);
-            (void)Kymo_Init(&tcpContext, &tcpConfig);
+            (void)initializeTcpStream();
             (void)Serial.println("KYMO_TCP_CONNECTED=1");
         } else {
             extraClient = tcpServer.available();
@@ -121,9 +125,9 @@ static void serviceTcp(void)
 /*******************************************************************************
  * writeMqtt
  ******************************************************************************/
-static uint8_t writeMqtt(void *user, const uint8_t *bytes, uint8_t length)
+static size_t writeMqtt(void *user, const uint8_t *bytes, size_t length)
 {
-    uint8_t written = 0u;
+    size_t written = 0u;
     (void)user;
     if ((bytes != nullptr) && mqtt.connected() &&
         mqtt.publish(MQTT_TOPIC, bytes, length, false)) {
@@ -131,18 +135,32 @@ static uint8_t writeMqtt(void *user, const uint8_t *bytes, uint8_t length)
     }
     return written;
 }
-static const KymoChannel mqttChannels[] = {{100u, 3u, KYMO_FLAG_TIMESTAMP}};
-static KymoConfig makeMqttConfig()
+/*******************************************************************************
+ * makeMqttConfig
+ ******************************************************************************/
+static KymoEndpointConfig makeMqttConfig()
 {
-    KymoConfig config = {};
-    config.channels = mqttChannels;
-    config.channel_count = 1u;
+    KymoEndpointConfig config = {};
     config.clock_ms = readClockMs;
-    config.sample = readSample;
-    config.write = writeMqtt;
+    config.tx.write = writeMqtt;
     return config;
 }
-static const KymoConfig mqttConfig = makeMqttConfig();
+static const KymoEndpointConfig mqttConfig = makeMqttConfig();
+/*******************************************************************************
+ * initializeMqttStream
+ ******************************************************************************/
+static KymoStatus initializeMqttStream(void)
+{
+    const KymoEndpointPlotConfig plot = networkPlotConfig(false);
+    KymoStatus status = KYMO_BAD_CONFIG;
+    mqttContext.~ProbeCore();
+    new (&mqttContext) ProbeCore{};
+    mqttPlot.~KymoEndpointPlot();
+    new (&mqttPlot) KymoEndpointPlot{};
+    status = probeCoreInit(&mqttContext, &mqttConfig);
+    if (status == KYMO_OK) { status = KymoEndpointPlot_Init(&mqttContext.endpoint, &mqttPlot, &plot); }
+    return status;
+}
 
 /** @brief Retry MQTT every five seconds and service its connection. */
 /*******************************************************************************
@@ -154,7 +172,7 @@ static void serviceMqtt(void)
     if (!mqtt.connected() && (nowMs - lastMqttAttemptMs >= 5000u)) {
         lastMqttAttemptMs = nowMs;
         if (mqtt.connect(MQTT_CLIENT_ID)) {
-            (void)Kymo_Init(&mqttContext, &mqttConfig);
+            (void)initializeMqttStream();
         }
     }
     (void)mqtt.loop();
@@ -231,13 +249,13 @@ void demoNetworkInit(void)
     (void)WiFi.begin(KYMO_WIFI_SSID, KYMO_WIFI_PASSWORD);
     isReady = true;
 #if KYMO_DEMO_TCP_ENABLE
-    isReady = (Kymo_Init(&tcpContext, &tcpConfig) == KYMO_OK) && isReady;
+    isReady = (initializeTcpStream() == KYMO_OK) && isReady;
 #endif
 #if KYMO_DEMO_MQTT_ENABLE
     (void)mqttSocket.setTimeout(1u);
     (void)mqtt.setServer(MQTT_HOST, 1883u);
     (void)mqtt.setSocketTimeout(1u);
-    isReady = (Kymo_Init(&mqttContext, &mqttConfig) == KYMO_OK) && isReady;
+    isReady = (initializeMqttStream() == KYMO_OK) && isReady;
 #endif
     (void)Serial.println(isReady ? "KYMO_NETWORK_READY=1" : "KYMO_NETWORK_READY=0");
 }
@@ -252,12 +270,12 @@ void demoNetworkMain(void)
     if (isReady && wasWifiConnected) {
 #if KYMO_DEMO_TCP_ENABLE
         if (tcpClient.connected()) {
-            (void)Kymo_Main(&tcpContext);
+            (void)KymoEndpoint_Main(&tcpContext.endpoint);
         }
 #endif
 #if KYMO_DEMO_MQTT_ENABLE
         if (mqtt.connected()) {
-            (void)Kymo_Main(&mqttContext);
+            (void)KymoEndpoint_Main(&mqttContext.endpoint);
         }
 #endif
     }

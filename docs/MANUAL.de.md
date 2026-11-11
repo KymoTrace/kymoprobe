@@ -32,8 +32,8 @@ pio run -e nodemcu-32s -t upload
 ```
 
 `src/uart_demo.cpp` initialisiert Serial mit **115200 Baud** und ruft Init/Main auf.
-`examples/common/arduino_serial_config.h` enthält Kanäle, Abtastintervalle, Messwertfunktion und
-Transport. Im Beispiel senden Kanal 0 und 1 Sinus/Sägezahn mit je 50 Hz und
+`lib/ProbeEndpoint/src/kymo_plot.cpp` enthält Kanäle, Abtastintervalle und Messwertfunktion.
+Der Serial-Port liegt getrennt in `kymo_port_arduino.cpp`. Im Beispiel senden Kanal 0 und 1 Sinus/Sägezahn mit je 50 Hz und
 Zeitstempeln. Eigene Messwerte werden im `example_sample`-Callback übernommen.
 
 In KymoStudio eine serielle Verbindung zum Board mit **115200, 8N1** öffnen.
@@ -50,7 +50,7 @@ pio run -d examples/arduino/multi_sensor_example -e uno
 ```
 
 Die Beispiele erzeugen reproduzierbare Testsignale. Im gemeinsamen
-`examples/common/arduino_serial_config.h` kann `example_sample` durch
+`lib/ProbeEndpoint/src/kymo_plot.cpp` kann `example_sample` durch
 `analogRead()` oder eigene Sensorwerte ersetzt werden. Das zweite Beispiel
 zeigt Y, X/Y und X/Y/Z mit unabhängigen Abtastraten. Arduino Uno/Nano/Mega
 und ESP32-Projekte nutzen denselben C++11-Kern.

@@ -61,8 +61,8 @@ monitor first.
 
 ## Sending your own measurements
 
-For the default `nodemcu-32s` project, everything you need to adapt is in one file:
-[`examples/common/arduino_serial_config.h`](examples/common/arduino_serial_config.h). There you define channels and
+For the default `nodemcu-32s` project, waveform channels and sampling live in:
+[`lib/ProbeEndpoint/src/kymo_plot.cpp`](lib/ProbeEndpoint/src/kymo_plot.cpp). There you define channels and
 sampling intervals and provide the measured value:
 
 ```cpp
@@ -78,8 +78,10 @@ static const KymoChannel example_channels[] = {
 };
 ```
 
-The main loop stays tiny: call `Kymo_Init()` once, then `Kymo_Main()` on every
-pass. KymoCore decides which channel is due and never waits for the interface.
+Initialize `ProbeCore`, then the Plot feature with `probeWaveformInit()`. The
+application calls `KymoEndpoint_Main()` on each pass. The Serial adapter lives
+separately in `lib/ProbeEndpoint/src/kymo_port_arduino.cpp`; feature headers expose
+only their own configuration and initialization functions.
 
 ## Development and production builds
 

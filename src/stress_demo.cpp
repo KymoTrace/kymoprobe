@@ -19,67 +19,10 @@
 #include <Arduino.h>
 #include <string.h>
 
-#ifndef KYMO_STRESS_CHANNEL_COUNT
-/** @brief Number of unique wire IDs, 1..256; override with a build definition. */
-#define KYMO_STRESS_CHANNEL_COUNT 256
-#endif
-#ifndef KYMO_STRESS_PERIOD_MS
-/** @brief Per-channel interval; zero sends as fast as the transport permits. */
-#define KYMO_STRESS_PERIOD_MS 0
-#endif
-#ifndef KYMO_STRESS_BAUD
-/** @brief USB UART baud rate; must match the Studio connection. */
-#define KYMO_STRESS_BAUD 2000000
-#endif
-#ifndef KYMO_STRESS_TCP_ENABLE
-/** @brief Select TCP (1) or USB UART (0). */
-#define KYMO_STRESS_TCP_ENABLE 0
-#endif
-#ifndef KYMO_STRESS_UDP_ENABLE
-/** @brief Send UDP datagrams (1) instead of USB UART or TCP. */
-#define KYMO_STRESS_UDP_ENABLE 0
-#endif
-#ifndef KYMO_STRESS_UDP_PORT
-/** @brief UDP port KymoStudio listens on. */
-#define KYMO_STRESS_UDP_PORT 2324
-#endif
-#ifndef KYMO_STRESS_XYZ_ENABLE
-/** @brief Include X and Z in addition to Y and the millisecond timestamp. */
-#define KYMO_STRESS_XYZ_ENABLE 0
-#endif
-
-#if (KYMO_STRESS_CHANNEL_COUNT < 1) || (KYMO_STRESS_CHANNEL_COUNT > 256)
-#error "KYMO_STRESS_CHANNEL_COUNT must be 1..256"
-#endif
-#if KYMO_STRESS_CHANNEL_COUNT > KYMO_MAX_CHANNELS
-#error "Set KYMO_MAX_CHANNELS to at least KYMO_STRESS_CHANNEL_COUNT"
-#endif
-#if (KYMO_STRESS_PERIOD_MS < 0) || (KYMO_STRESS_PERIOD_MS > 2147483647)
-#error "KYMO_STRESS_PERIOD_MS must be 0..INT32_MAX"
-#endif
-#if (KYMO_STRESS_BAUD < 1)
-#error "KYMO_STRESS_BAUD must be positive"
-#endif
-#if ((KYMO_STRESS_TCP_ENABLE != 0) && (KYMO_STRESS_TCP_ENABLE != 1)) || \
-    ((KYMO_STRESS_XYZ_ENABLE != 0) && (KYMO_STRESS_XYZ_ENABLE != 1)) || \
-    ((KYMO_STRESS_UDP_ENABLE != 0) && (KYMO_STRESS_UDP_ENABLE != 1))
-#error "Stress feature switches must be 0 or 1"
-#endif
-#if KYMO_STRESS_TCP_ENABLE && KYMO_STRESS_UDP_ENABLE
-#error "Select either the TCP or the UDP stress transport"
-#endif
-/** @brief WiFi is needed by both network transports. */
-#define KYMO_STRESS_WIFI (KYMO_STRESS_TCP_ENABLE || KYMO_STRESS_UDP_ENABLE)
-#if !KYMO_ENABLE_RUNTIME || !KYMO_ENABLE_TIMESTAMP
-#error "Stress demo requires KYMO_ENABLE_RUNTIME=1 and KYMO_ENABLE_TIMESTAMP=1"
-#endif
-#if KYMO_STRESS_XYZ_ENABLE && (!KYMO_ENABLE_X || !KYMO_ENABLE_Z)
-#error "XYZ stress demo requires KYMO_ENABLE_X=1 and KYMO_ENABLE_Z=1"
-#endif
-#if defined(KYMO_DEMO_NETWORK_ENABLE) && KYMO_DEMO_NETWORK_ENABLE
-#error "Select either the network demo or the stress demo"
-#endif
-
+#include "features/stress/Config.h"
+#include "features/stress/kymo_plot.h"
+#include <probe/kymo_init.h>
+#include <new>
 #if KYMO_STRESS_WIFI
 #include <WiFi.h>
 #include "network_secrets.h"
@@ -101,9 +44,8 @@ static const uint16_t OUTPUT_CAPACITY = 1400u;
 static const uint16_t OUTPUT_CAPACITY = 4096u;
 #endif
 static const uint16_t MAIN_CALLS_PER_LOOP = 512u;
-static KymoContext s_context;
-static KymoChannel s_channels[KYMO_STRESS_CHANNEL_COUNT];
-static uint32_t s_sampleCounts[KYMO_STRESS_CHANNEL_COUNT];
+static ProbeCore s_context;
+static KymoEndpointPlot s_plot;
 static uint8_t s_output[OUTPUT_CAPACITY];
 static uint16_t s_outputLength = 0u;
 static uint16_t s_outputOffset = 0u;
@@ -124,30 +66,6 @@ static uint32_t readStressClockMs(void *user)
  * @param[in] user Unused. @param[in] id Channel ID.
  * @param[out] out Coordinates in [-1, 1]. @return One on success, zero otherwise.
  * @note Not ISR-safe. Each channel advances only when actually sampled. */
-/*******************************************************************************
- * readStressSample
- ******************************************************************************/
-static uint8_t readStressSample(void *user, uint8_t id, KymoSample *out)
-{
-    uint8_t result = 0u;
-    uint32_t phase = 0u;
-    bool isValidId = true;
-    (void)user;
-#if KYMO_STRESS_CHANNEL_COUNT < 256
-    isValidId = id < KYMO_STRESS_CHANNEL_COUNT;
-#endif
-    if ((out != nullptr) && isValidId) {
-        phase = (s_sampleCounts[id] + static_cast<uint32_t>(id) * 17u) % 2048u;
-        out->value = static_cast<float>(phase) / 1023.5f - 1.0f;
-#if KYMO_STRESS_XYZ_ENABLE
-        out->x = static_cast<float>((phase + 512u) % 2048u) / 1023.5f - 1.0f;
-        out->z = static_cast<float>((phase + 1024u) % 2048u) / 1023.5f - 1.0f;
-#endif
-        ++s_sampleCounts[id];
-        result = 1u;
-    }
-    return result;
-}
 
 /** @brief Copy one core frame into application-owned batch storage.
  * @param[in] user Unused. @param[in] bytes Borrowed frame bytes.
@@ -155,11 +73,11 @@ static uint8_t readStressSample(void *user, uint8_t id, KymoSample *out)
 /*******************************************************************************
  * enqueueStressFrame
  ******************************************************************************/
-static uint8_t enqueueStressFrame(void *user, const uint8_t *bytes, uint8_t length)
+static size_t enqueueStressFrame(void *user, const uint8_t *bytes, size_t length)
 {
-    uint8_t written = 0u;
+    size_t written = 0u;
     (void)user;
-    if ((bytes != nullptr) && (length <= OUTPUT_CAPACITY - s_outputLength)) {
+    if ((bytes != nullptr) && (length <= static_cast<size_t>(OUTPUT_CAPACITY - s_outputLength))) {
         (void)memcpy(s_output + s_outputLength, bytes, length);
         s_outputLength = static_cast<uint16_t>(s_outputLength + length);
         written = length;
@@ -169,27 +87,8 @@ static uint8_t enqueueStressFrame(void *user, const uint8_t *bytes, uint8_t leng
 
 /** @brief Apply backpressure before sampling when a full frame cannot fit.
  * @param[in] user Unused. @return One when the batch has insufficient space. */
-/*******************************************************************************
- * isStressOutputBusy
- ******************************************************************************/
-static uint8_t isStressOutputBusy(void *user)
-{
-    (void)user;
-    return static_cast<uint8_t>(static_cast<uint16_t>(OUTPUT_CAPACITY - s_outputLength) < KYMO_FRAME_MAX_SIZE);
-}
 
-static KymoConfig makeStressConfig()
-{
-    KymoConfig config = {};
-    config.channels = s_channels;
-    config.channel_count = KYMO_STRESS_CHANNEL_COUNT;
-    config.clock_ms = readStressClockMs;
-    config.sample = readStressSample;
-    config.write = enqueueStressFrame;
-    config.busy = isStressOutputBusy;
-    return config;
-}
-static const KymoConfig STRESS_CONFIG = makeStressConfig();
+
 
 /** @brief Restart at a frame boundary, discarding stale data after reconnect. */
 /*******************************************************************************
@@ -199,8 +98,17 @@ static void resetStressStream()
 {
     s_outputLength = 0u;
     s_outputOffset = 0u;
-    (void)memset(s_sampleCounts, 0, sizeof(s_sampleCounts));
-    s_isReady = Kymo_Init(&s_context, &STRESS_CONFIG) == KYMO_OK;
+    // Copying transport: old socket is closed, no driver borrows Endpoint bytes.
+    s_context.~ProbeCore();
+    new (&s_context) ProbeCore{};
+    s_plot.~KymoEndpointPlot();
+    new (&s_plot) KymoEndpointPlot{};
+    KymoEndpointConfig port = {};
+    const KymoEndpointPlotConfig plot = stressPlotConfig();
+    port.clock_ms = readStressClockMs;
+    port.tx.write = enqueueStressFrame;
+    s_isReady = probeCoreInit(&s_context, &port) == KYMO_OK;
+    if (s_isReady) { s_isReady = KymoEndpointPlot_Init(&s_context.endpoint, &s_plot, &plot) == KYMO_OK; }
 }
 
 /** @brief Consume a batch prefix once, preserving unsent bytes for the next loop.
@@ -304,14 +212,6 @@ static void serviceStressNetwork()
  ******************************************************************************/
 void demoStressInit()
 {
-    for (uint16_t channelIndex = 0u; channelIndex < KYMO_STRESS_CHANNEL_COUNT; ++channelIndex) {
-        s_channels[channelIndex].id = static_cast<uint8_t>(channelIndex);
-        s_channels[channelIndex].period_ms = KYMO_STRESS_PERIOD_MS;
-        s_channels[channelIndex].flags = KYMO_FLAG_TIMESTAMP;
-#if KYMO_STRESS_XYZ_ENABLE
-        s_channels[channelIndex].flags = KYMO_FLAG_TIMESTAMP | KYMO_FLAG_X | KYMO_FLAG_Z;
-#endif
-    }
 #if KYMO_STRESS_WIFI
     Serial.begin(115200u);
     WiFi.persistent(false);
@@ -351,8 +251,9 @@ void demoStressMain()
     if (canSend) {
         flushStressOutput();
         for (uint16_t callIndex = 0u;
-             (callIndex < MAIN_CALLS_PER_LOOP) && (status == KYMO_OK); ++callIndex) {
-            status = Kymo_Main(&s_context);
+             (callIndex < MAIN_CALLS_PER_LOOP) && ((status == KYMO_OK) || (status == KYMO_BUSY)); ++callIndex) {
+            if (static_cast<size_t>(OUTPUT_CAPACITY - s_outputLength) < KYMO_FRAME_MAX_SIZE) { break; }
+            status = KymoEndpoint_Main(&s_context.endpoint);
         }
         flushStressOutput();
     }

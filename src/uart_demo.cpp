@@ -3,8 +3,12 @@
 #include "demo_selection.h"
 #include <KymoCore.h>
 #if (KYMO_DEMO_MODE == KYMO_DEMO_UART) && KYMO_EFFECTIVE_RUNTIME
-#include "../examples/common/arduino_serial_config.h"
-static KymoContext uartContext;
+#include <Arduino.h>
+#include <probe/kymo_init.h>
+#include <probe/kymo_port.h>
+#include <probe/kymo_plot.h>
+static ProbeCore uartContext;
+static KymoStatus uartStatus = KYMO_BAD_CONFIG;
 
 /** @brief Start UART and its fixed runtime configuration. */
 /*******************************************************************************
@@ -13,7 +17,10 @@ static KymoContext uartContext;
 void demoUartInit(void)
 {
     Serial.begin(115200u);
-    (void)Kymo_Init(&uartContext, &example_config);
+    const KymoEndpointConfig port = probeSerialConfig();
+    const KymoEndpointPlotConfig plot = probeWaveformConfig();
+    uartStatus = probeCoreInit(&uartContext, &port);
+    if (uartStatus == KYMO_OK) { uartStatus = probeWaveformInit(&uartContext.endpoint, &plot); }
 }
 
 /** @brief Advance acquisition and transmission cooperatively. */
@@ -22,6 +29,6 @@ void demoUartInit(void)
  ******************************************************************************/
 void demoUartMain(void)
 {
-    (void)Kymo_Main(&uartContext);
+    uartStatus = KymoEndpoint_Main(&uartContext.endpoint);
 }
 #endif

@@ -9,17 +9,19 @@
 #include <io.h>
 #endif
 #include <KymoCore.h>
+#include <endpoint/features/kymo_trace.h>
+#include <assert.h>
 #include <kymo_trace_ids.h>
 #include <kymo_trace_metadata.h>
 
 namespace {
 constexpr uint16_t kClockDomain = 1u;
-constexpr uint16_t kMaxFrameBytes = 128u;
-KymoTraceRecorder traceRecorder;
-KymoMux transportMux;
+KymoEndpoint endpoint;
+KymoEndpointTrace feature;
+uint8_t txBuffer[KYMO_TRACE_FRAME_MAX];
+uint64_t ticks = 1u;
 uint64_t traceSessionId = 0u;
-uint8_t metadataStage = 0u;
-uint64_t metadataCycleStartTicks = 0u;
+
 
 /*******************************************************************************
  * kymo_trace_session_id
@@ -44,9 +46,7 @@ void configureBinaryOutput(void)
  ******************************************************************************/
 uint64_t traceClockTicks(void *user)
 {
-    const auto elapsed = std::chrono::steady_clock::now().time_since_epoch();
-    uint64_t result = static_cast<uint64_t>(
-        std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count());
+    uint64_t result = ticks;
     (void)user;
     return result;
 }
@@ -79,7 +79,8 @@ size_t traceWriteFrame(void *user, const uint8_t *bytes, size_t length)
     size_t result = 0u;
     (void)user;
     if (bytes != nullptr) {
-        result = std::fwrite(bytes, 1u, length, stdout);
+        const size_t WRITE_LIMIT = 17u;
+        result = std::fwrite(bytes, 1u, length < WRITE_LIMIT ? length : WRITE_LIMIT, stdout);
     }
     return result;
 }
@@ -99,45 +100,12 @@ uint8_t traceIsBusy(void *user)
  ******************************************************************************/
 void traceInstrumentedWork(uint32_t iteration)
 {
-    KYMO_TRACE_SCOPE(&traceRecorder, KYMO_CONTEXT_MAIN,
+    KYMO_TRACE_SCOPE(&feature.recorder, KYMO_CONTEXT_MAIN,
                      KYMO_SYMBOL_SIMULATED_WORK);
-    KYMO_TRACE_MARK(&traceRecorder, KYMO_CONTEXT_MAIN,
+    KYMO_TRACE_MARK(&feature.recorder, KYMO_CONTEXT_MAIN,
                     KYMO_SYMBOL_ITERATION, iteration);
 }
 
-/*******************************************************************************
- * traceQueueMetadata
- ******************************************************************************/
-void traceQueueMetadata(void)
-{
-    KymoStatus queued = KYMO_REJECTED;
-    if (metadataStage == 0u) {
-        queued = KymoMux_QueueAdmin(&transportMux,
-            KYMO_TRACE_PAYLOAD_SESSION_META, 1u,
-            kymo_trace_session_metadata,
-            kymo_trace_session_metadata_length);
-        if (queued == KYMO_OK) {
-            metadataStage = 1u;
-        }
-    } else if ((metadataStage == 1u) &&
-               (transportMux.admin_pending == 0u)) {
-        queued = KymoMux_QueueAdmin(&transportMux,
-            KYMO_TRACE_PAYLOAD_DICTIONARY, 1u,
-            kymo_trace_dictionary,
-            kymo_trace_dictionary_length);
-        if (queued == KYMO_OK) {
-            metadataStage = 2u;
-        }
-    } else if ((metadataStage == 2u) &&
-               (transportMux.admin_pending == 0u)) {
-        metadataStage = 3u;
-        metadataCycleStartTicks = traceClockTicks(nullptr);
-    } else if ((metadataStage == 3u) &&
-               ((traceClockTicks(nullptr) - metadataCycleStartTicks) >=
-                5000000u)) {
-        metadataStage = 0u;
-    }
-}
 }
 
 /*******************************************************************************
@@ -145,37 +113,41 @@ void traceQueueMetadata(void)
  ******************************************************************************/
 int main(void)
 {
-    KymoTraceConfig recorderConfig = {};
-    KymoMuxConfig muxConfig = {};
-    KymoStatus result = KYMO_REJECTED;
+    KymoEndpointConfig port = {};
+    KymoEndpointTraceConfig config = {};
     configureBinaryOutput();
-    traceSessionId = traceClockTicks(nullptr);
-    recorderConfig.clock_ticks = traceClockTicks;
-    recorderConfig.core_id = traceCoreId;
-    recorderConfig.current_context = traceCurrentContext;
-    recorderConfig.session_id = kymo_trace_session_id();
-    recorderConfig.clock_domain_id = kClockDomain;
-    result = KymoTrace_Init(&traceRecorder, &recorderConfig);
-    muxConfig.recorder = &traceRecorder;
-    muxConfig.write = traceWriteFrame;
-    muxConfig.busy = traceIsBusy;
-    muxConfig.max_frame_size = kMaxFrameBytes;
-    muxConfig.health_period_ticks = 0u;
-    result = (result == KYMO_OK) ? KymoMux_Init(&transportMux, &muxConfig) : result;
-    if (result == KYMO_OK) {
-        for (uint32_t iteration = 0u; iteration < 128u; ++iteration) {
-            KYMO_TRACE_SCOPE(&traceRecorder, KYMO_CONTEXT_MAIN,
-                             KYMO_SYMBOL_MAIN_LOOP);
+    traceSessionId = 1u;
+    port.tx.buffer = txBuffer;
+    port.tx.capacity = sizeof(txBuffer);
+    port.tx.write = traceWriteFrame;
+    port.tx.busy = traceIsBusy;
+    config.recorder.clock_ticks = traceClockTicks;
+    config.recorder.core_id = traceCoreId;
+    config.recorder.current_context = traceCurrentContext;
+    config.recorder.session_id = kymo_trace_session_id();
+    config.recorder.clock_domain_id = kClockDomain;
+    config.metadata = kymo_trace_session_metadata;
+    config.metadata_length = kymo_trace_session_metadata_length;
+    config.dictionary = kymo_trace_dictionary;
+    config.dictionary_length = kymo_trace_dictionary_length;
+    config.generation = 1u;
+    config.metadata_period_ticks = 5000000u;
+    assert(KymoEndpoint_Init(&endpoint, &port) == KYMO_OK);
+    assert(KymoEndpointTrace_Init(&endpoint, &feature, &config) == KYMO_OK);
+    for (uint32_t iteration = 0u; iteration < 128u; ++iteration) {
+        {
+            KYMO_TRACE_SCOPE(&feature.recorder, KYMO_CONTEXT_MAIN, KYMO_SYMBOL_MAIN_LOOP);
             traceInstrumentedWork(iteration);
-            for (uint8_t servicePass = 0u; servicePass < 8u; ++servicePass) {
-                (void)KymoMux_Service(&transportMux);
-            }
-            traceQueueMetadata();
         }
-        for (uint16_t servicePass = 0u; servicePass < 512u; ++servicePass) {
-            (void)KymoMux_Service(&transportMux);
-            traceQueueMetadata();
+        ticks += 100000u;
+        for (uint32_t turn = 0u; turn < 100u; ++turn) {
+            (void)KymoEndpoint_Main(&endpoint);
         }
     }
-    return (result == KYMO_OK) ? 0 : 1;
+    assert(KymoEndpoint_RequestStop(&endpoint) == KYMO_OK);
+    for (uint32_t turn = 0u; turn < 4000u && endpoint.phase != KYMO_ENDPOINT_STOPPED; ++turn) {
+        (void)KymoEndpoint_Main(&endpoint);
+    }
+    assert(endpoint.phase == KYMO_ENDPOINT_STOPPED);
+    return 0;
 }

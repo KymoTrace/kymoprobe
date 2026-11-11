@@ -1,102 +1,27 @@
-/* SPDX-License-Identifier: MIT
- * Copyright (c) 2026 Christof Seidel */
+/* SPDX-License-Identifier: MIT */
+/** @file wifi_mqtt_example.ino @brief Endpoint startup and cooperative processing. */
 #include <Arduino.h>
-#include <WiFi.h>
-#include <PubSubClient.h>
-#include <math.h>
-#include <KymoCore.h>
-
-#if KYMO_EFFECTIVE_RUNTIME
-// Edit credentials, endpoint and channels here. Do not commit real secrets.
-static const char *WIFI_SSID = "YourWiFiSSID";
-static const char *WIFI_PASSWORD = "YourWiFiPassword";
-static const char *MQTT_BROKER = "192.168.1.100";
-static const char *MQTT_TOPIC = "sensor/data";
-static WiFiClient wifi;
-static PubSubClient mqtt(wifi);
-static KymoContext kymo;
-static uint32_t last_connect;
-
+#include <probe/kymo_init.h>
+#include "src/kymo_port.h"
+#include "src/kymo_plot.h"
+static ProbeCore core;
+static KymoEndpointPlot plot;
+static KymoStatus status = KYMO_BAD_CONFIG;
 /*******************************************************************************
- * clock_ms
+ * setup
  ******************************************************************************/
-static uint32_t clock_ms(void *) { return millis(); }
-
-/*******************************************************************************
- * sample
- ******************************************************************************/
-static uint8_t sample(void *, uint8_t id, KymoSample *out) {
-    float phase = (millis() % 2000u) / 2000.0f;
-    out->value = id == 0 ? sinf(phase * 6.283185307f) : 2.0f * phase - 1.0f;
-    return 1;
-}
-
-/*******************************************************************************
- * service
- ******************************************************************************/
-static void service(void *) {
-    uint32_t now = millis();
-    // PubSubClient connect() is synchronous: not a hard real-time transport.
-    if (WiFi.status() == WL_CONNECTED && !mqtt.connected() &&
-        (uint32_t)(now - last_connect) >= 5000u) {
-        last_connect = now;
-        mqtt.connect("KymoECU"); // choose a unique ID for each device
-    }
-    mqtt.loop();
-}
-
-/*******************************************************************************
- * busy
- ******************************************************************************/
-static uint8_t busy(void *) { return !mqtt.connected(); }
-
-/*******************************************************************************
- * write_frame
- ******************************************************************************/
-static uint8_t write_frame(void *, const uint8_t *bytes, uint8_t length) {
-    // Message transport: accept the entire binary payload or retry later.
-    return mqtt.publish(MQTT_TOPIC, bytes, length) ? length : 0;
-}
-static const KymoChannel channels[] = {
-    {100, 0, KYMO_FLAG_TIMESTAMP}, {100, 1, KYMO_FLAG_TIMESTAMP}
-};
-static KymoConfig make_config()
+void setup(void)
 {
-    KymoConfig config = {};
-    config.channels = channels;
-    config.channel_count = 2;
-    config.clock_ms = clock_ms;
-    config.sample = sample;
-    config.write = write_frame;
-    config.busy = busy;
-    config.service = service;
-    return config;
+    const KymoEndpointConfig port = kymoMqttPortConfig();
+    const KymoEndpointPlotConfig config = kymoPlotConfig();
+    kymoMqttPortInit();
+    status = probeCoreInit(&core, &port);
+    if (status == KYMO_OK) { status = KymoEndpointPlot_Init(&core.endpoint, &plot, &config); }
 }
-static const KymoConfig config = make_config();
-
-/*******************************************************************************
- * setup
- ******************************************************************************/
-void setup() {
-    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-    mqtt.setServer(MQTT_BROKER, 1883);
-    mqtt.setSocketTimeout(1);
-    last_connect = millis() - 5000u;
-    (void)Kymo_Init(&kymo, &config);
-}
-
 /*******************************************************************************
  * loop
  ******************************************************************************/
-void loop() { (void)Kymo_Main(&kymo); }
-#else
-/*******************************************************************************
- * setup
- ******************************************************************************/
-void setup() {}
-
-/*******************************************************************************
- * loop
- ******************************************************************************/
-void loop() {}
-#endif
+void loop(void)
+{
+    status = KymoEndpoint_Main(&core.endpoint);
+}
