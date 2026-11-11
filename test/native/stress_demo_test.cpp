@@ -14,15 +14,16 @@ TestSerial Serial;
 #include "../../src/stress_demo.cpp"
 
 /** @brief Decode all captured frames and assert round-robin delivery.
+ * @param[in] firstSampleClock Device clock at the start of this stream.
  * @return Verified complete frames. */
 /*******************************************************************************
  * verifyCapturedFrames
  ******************************************************************************/
-static uint32_t verifyCapturedFrames()
+static uint32_t verifyCapturedFrames(uint32_t firstSampleClock)
 {
     size_t position = 0u;
     uint32_t frames = 0u;
-    uint32_t previousTimestamp = 0u;
+    uint32_t previousElapsed = 0u;
     uint32_t counts[KYMO_STRESS_CHANNEL_COUNT] = {};
     while (position < testWire.size()) {
         const size_t frameLength = KymoProtocol_FrameLength(testWire[position + 2u]);
@@ -37,7 +38,11 @@ static uint32_t verifyCapturedFrames()
         expected = static_cast<float>(phase) / 1023.5f - 1.0f;
         assert(fabsf(point.value - expected) < 0.00001f);
         assert((point.flags & KYMO_FLAG_TIMESTAMP) != 0u);
-        assert(point.timestamp_ms >= previousTimestamp);
+        /* Endpoint preserves the device clock, including its uint32 wrap. */
+        const uint32_t elapsed = point.timestamp_ms - firstSampleClock;
+        if (frames == 0u) { assert(point.timestamp_ms == firstSampleClock); }
+        assert(elapsed >= previousElapsed);
+        assert(elapsed <= static_cast<uint32_t>(testClockMs - firstSampleClock));
 #if KYMO_STRESS_XYZ_ENABLE
         assert((point.flags & (KYMO_FLAG_X | KYMO_FLAG_Z)) == (KYMO_FLAG_X | KYMO_FLAG_Z));
         assert(fabsf(point.x - (static_cast<float>((phase + 512u) % 2048u) / 1023.5f - 1.0f)) < 0.00001f);
@@ -45,7 +50,7 @@ static uint32_t verifyCapturedFrames()
 #endif
         ++counts[point.id];
         ++frames;
-        previousTimestamp = point.timestamp_ms;
+        previousElapsed = elapsed;
         position += frameLength;
     }
     assert(frames > 256u);
@@ -63,6 +68,7 @@ static uint32_t verifyCapturedFrames()
 int32_t main()
 {
     uint32_t sampledWhileBlocked = 0u;
+    uint32_t firstSampleClock = testClockMs;
     demoStressInit();
     assert(s_isReady);
     assert(Serial.m_baud == KYMO_STRESS_BAUD);
@@ -87,7 +93,7 @@ int32_t main()
     }
     assert(s_context.endpoint.phase == KYMO_ENDPOINT_STOPPED);
     while (s_outputLength > 0u) { flushStressOutput(); }
-    (void)verifyCapturedFrames();
+    (void)verifyCapturedFrames(firstSampleClock);
 
     resetStressStream();
     // Start a new session after discarding a partially transmitted batch.
@@ -97,6 +103,7 @@ int32_t main()
     assert(s_outputOffset > 0u);
     resetStressStream();
     testWire.clear();
+    firstSampleClock = testClockMs;
     for (uint16_t iteration = 0u; iteration < 2000u; ++iteration) {
         demoStressMain();
     }
@@ -107,6 +114,6 @@ int32_t main()
     }
     assert(s_context.endpoint.phase == KYMO_ENDPOINT_STOPPED);
     while (s_outputLength > 0u) { flushStressOutput(); }
-    (void)verifyCapturedFrames();
+    (void)verifyCapturedFrames(firstSampleClock);
     return 0;
 }

@@ -1,0 +1,358 @@
+{
+  "date": "2026-11-11",
+  "probe_tag": "v7.3.3",
+  "core_commit": "0e195379efd051c20c5db09e3f634847c4f487d3",
+  "studio_commit": "5148abd75aeb5cfe2132138d38d7e7c692a15478",
+  "board": "ESP32 via CP210x on COM4",
+  "builds": [
+    {
+      "project": "examples/esp32/task_trace_example",
+      "environment": "esp32-runtime-test",
+      "passed": true
+    },
+    {
+      "project": ".",
+      "environment": "nodemcu-32s",
+      "passed": true
+    },
+    {
+      "project": ".",
+      "environment": "nodemcu-32s-uart",
+      "passed": true
+    },
+    {
+      "project": ".",
+      "environment": "nodemcu-32s-mqtt",
+      "passed": true
+    },
+    {
+      "project": ".",
+      "environment": "nodemcu-32s-tcp",
+      "passed": true
+    },
+    {
+      "project": ".",
+      "environment": "nodemcu-32s-network",
+      "passed": true
+    },
+    {
+      "project": ".",
+      "environment": "nodemcu-32s-development",
+      "passed": true
+    },
+    {
+      "project": ".",
+      "environment": "nodemcu-32s-production",
+      "passed": true
+    },
+    {
+      "project": ".",
+      "environment": "nodemcu-32s-stress-usb",
+      "passed": true
+    },
+    {
+      "project": ".",
+      "environment": "nodemcu-32s-stress-tcp",
+      "passed": true
+    },
+    {
+      "project": ".",
+      "environment": "nodemcu-32s-stress-udp",
+      "passed": true
+    },
+    {
+      "project": ".",
+      "environment": "nodemcu-32s-stress-tcp-xyz",
+      "passed": true
+    },
+    {
+      "project": ".",
+      "environment": "nodemcu-32s-features",
+      "passed": true
+    },
+    {
+      "project": ".",
+      "environment": "nodemcu-32s-trace",
+      "passed": true
+    },
+    {
+      "project": ".",
+      "environment": "nodemcu-32s-trace-production",
+      "passed": true
+    },
+    {
+      "project": ".",
+      "environment": "nodemcu-32s-trace-flow",
+      "passed": true
+    },
+    {
+      "project": "examples/integration",
+      "environment": "esp32dev",
+      "passed": true
+    },
+    {
+      "project": "examples/integration",
+      "environment": "uno",
+      "passed": true
+    },
+    {
+      "project": "examples/native",
+      "environment": "native",
+      "passed": true
+    },
+    {
+      "project": "examples/stm32/uart_example",
+      "environment": "nucleo_f401re",
+      "passed": true
+    },
+    {
+      "project": "examples/stm32/uart_example",
+      "environment": "nucleo_f411re",
+      "passed": true
+    },
+    {
+      "project": "examples/stm32/uart_example",
+      "environment": "bluepill_f103c8",
+      "passed": true
+    },
+    {
+      "project": "examples/stm32/usb_cdc_example",
+      "environment": "bluepill_f103c8",
+      "passed": true
+    },
+    {
+      "project": "examples/esp32/kymocore_benchmark",
+      "environment": "esp32-benchmark-bitwise",
+      "passed": true
+    },
+    {
+      "project": "examples/esp32/kymocore_benchmark",
+      "environment": "esp32-benchmark-table",
+      "passed": true
+    },
+    {
+      "project": "examples/esp32/measurement_signals",
+      "environment": "esp32-measurement-signals",
+      "passed": true
+    },
+    {
+      "project": "examples/esp32/serial_example",
+      "environment": "esp32dev",
+      "passed": true
+    },
+    {
+      "project": "examples/esp32/serial_example",
+      "environment": "esp32-s3",
+      "passed": true
+    },
+    {
+      "project": "examples/esp32/serial_example",
+      "environment": "esp32-c3",
+      "passed": true
+    },
+    {
+      "project": "examples/esp32/stack_reserve",
+      "environment": "esp32-stack-reserve",
+      "passed": true
+    },
+    {
+      "project": "examples/esp32/text_signals",
+      "environment": "esp32-text-signals",
+      "passed": true
+    },
+    {
+      "project": "examples/esp32/wifi_mqtt_example",
+      "environment": "esp32dev",
+      "passed": true
+    },
+    {
+      "project": "examples/esp32/wifi_mqtt_example",
+      "environment": "esp32-s3",
+      "passed": true
+    },
+    {
+      "project": "examples/arduino/multi_sensor_example",
+      "environment": "uno",
+      "passed": true
+    },
+    {
+      "project": "examples/arduino/multi_sensor_example",
+      "environment": "nano",
+      "passed": true
+    },
+    {
+      "project": "examples/arduino/multi_sensor_example",
+      "environment": "mega",
+      "passed": true
+    },
+    {
+      "project": "examples/arduino/simple_analog_example",
+      "environment": "uno",
+      "passed": true
+    },
+    {
+      "project": "examples/arduino/simple_analog_example",
+      "environment": "nano",
+      "passed": true
+    },
+    {
+      "project": "examples/arduino/simple_analog_example",
+      "environment": "mega",
+      "passed": true
+    },
+    {
+      "project": "examples/esp32/trace_uart",
+      "environment": "esp32-trace",
+      "passed": true
+    },
+    {
+      "project": "examples/esp32/pi_controller",
+      "environment": "esp32-pi-controller",
+      "passed": true
+    },
+    {
+      "project": "examples/esp32/live_variables",
+      "environment": "esp32-live-variables",
+      "passed": true
+    },
+    {
+      "project": "examples/esp32/memory_telemetry",
+      "environment": "esp32-memory-telemetry",
+      "passed": true
+    },
+    {
+      "project": "examples/esp32/runtime_freertos",
+      "environment": "esp32-runtime-test",
+      "passed": true
+    }
+  ],
+  "studio_pytest": {
+    "passed": 647,
+    "subtests_passed": 321
+  },
+  "configurator_pytest": {
+    "passed": 80,
+    "skipped": 1,
+    "subtests_passed": 108
+  },
+  "hardware": {
+    "parameters": "confirmed 2.0 / 55.0; 95 rejected by Studio range validation",
+    "numeric_recording_samples": 1003,
+    "watch": "matching ELF, two subscriptions, 50 to 20 ms update, unsubscribe",
+    "memory": "five channels, device timestamps, memory chart, CSV/PNG",
+    "trace_capture": {
+      "complete": true,
+      "truncated": false,
+      "frame_counts": {
+        "3": 1096,
+        "5": 1096,
+        "1": 6,
+        "2": 4
+      },
+      "metadata_sequences": [
+        28301,
+        28302,
+        28303,
+        29214,
+        29215,
+        29216
+      ],
+      "dictionary_sequences": [
+        28304,
+        28305,
+        29217,
+        29218
+      ],
+      "other_records": []
+    },
+    "trace_new_gap_count": 0,
+    "trace_join_gaps": [
+      {
+        "reason": "unpaired_or_mismatched_exit"
+      }
+    ],
+    "replay_eof": {
+      "state": {
+        "capturing": false,
+        "replay_path": "D:\\Projekte\\Python\\Plotter\\KymoProbe\\.pio\\hardware-7.3.1\\trace-733.kymotrace",
+        "replay_active": false,
+        "paused": true,
+        "speed": 20,
+        "position_us": 12069000.0,
+        "seeking": false,
+        "eof": true,
+        "error": "",
+        "status": "Replay complete; target session has no verified SESSION_END"
+      },
+      "target_reached": false
+    },
+    "rendering": "PNG timed out twice with original rendering; succeeded after restart with QT_QUICK_BACKEND=software. Original cause unresolved."
+  },
+  "artifacts": [
+    {
+      "path": ".pio/hardware-7.3.1/pi-733-result.json",
+      "bytes": 5365,
+      "sha256": "9631fefa60cd482969eb0ba4c5e8e72df4e8f395b84740bd9e15fd4b5911ec4a"
+    },
+    {
+      "path": ".pio/hardware-7.3.1/watch-733-result.json",
+      "bytes": 6479,
+      "sha256": "f277fac5d0ef8e62f91bfc4fffa51d0b28a39fa2bc0b839626a5f62ea8149f8d"
+    },
+    {
+      "path": ".pio/hardware-7.3.1/memory-733-result.json",
+      "bytes": 7271,
+      "sha256": "efd7e499d90d87711ccb1c6a09cc5e0f8bdebda7a229d13c61195d174c7815cf"
+    },
+    {
+      "path": ".pio/hardware-7.3.1/trace-733-result.json",
+      "bytes": 217580,
+      "sha256": "204d7f003713033ff1b454aa527e02d382dbaf1c74b1629e9345a4f1416d1834"
+    },
+    {
+      "path": ".pio/hardware-7.3.1/trace-733-file-validation.json",
+      "bytes": 341,
+      "sha256": "20f7844523b2001ce4468837520c59b84cd208239928eb41526890bb25a44f34"
+    },
+    {
+      "path": ".pio/hardware-7.3.1/pi-733-reopened-result.json",
+      "bytes": 16899,
+      "sha256": "447193071e119f9ea26f752c63b3632478e4796c635f8988c1d846433a4f3d48"
+    },
+    {
+      "path": ".pio/hardware-7.3.1/trace-733.kymotrace",
+      "bytes": 1237668,
+      "sha256": "d79dd6e6132a0df625a7005c52bca675a3418bdd7ae0833cdeb4cebb487610e7"
+    },
+    {
+      "path": ".pio/hardware-7.3.1/pi-733-temperature.csv",
+      "bytes": 94817,
+      "sha256": "fd16f053ebcd7b0a3d43fb237b5ea1d96399afbb368a04134ba37465262c925d"
+    },
+    {
+      "path": ".pio/hardware-7.3.1/memory-733-heap.csv",
+      "bytes": 2938,
+      "sha256": "09b43e69a245f437c5d392741aaf303e9dc97fd6db95f71dc99d5e6b7107516a"
+    },
+    {
+      "path": ".pio/hardware-7.3.1/trace-733.csv",
+      "bytes": 1365475,
+      "sha256": "9c3e42974e0db9e7221c517c86ccd0838eeac462a7e847eec2329654d50bcc91"
+    },
+    {
+      "path": ".pio/hardware-7.3.1/trace-733-chrome.json",
+      "bytes": 3178089,
+      "sha256": "605b3deeb7e7e1b42d4d901e8426380eba95edae6dd63bb8e5480253a40a4198"
+    },
+    {
+      "path": ".pio/hardware-7.3.1/pi-733-software.png",
+      "bytes": 17920,
+      "sha256": "3481e45a612fcb2b052bfcc52e6fd5614f977260d6c97c153699c6d5696eadfa"
+    },
+    {
+      "path": ".pio/hardware-7.3.1/memory-733.png",
+      "bytes": 15499,
+      "sha256": "8885d301e5cf8b391f8dc8b64fa4f29d4e10f81240bc05426d9bb1cc41d34600"
+    }
+  ]
+}

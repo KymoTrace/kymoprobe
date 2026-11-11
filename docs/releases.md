@@ -66,6 +66,7 @@ bounded partial writes, including frames larger than the hardware FIFO.
 The original Probe v7.3.0 baseline remains unchanged.
 
 Core 7.3.3 also preserves device timestamps for Parameter, Watch and Memory
-samples. The Trace UART example allocates a 1024-byte serial TX buffer before
+samples and uses the same device-clock origin for Plot and control samples.
+The Trace UART example allocates a 1024-byte serial TX buffer before
 opening the port so that FIFO-sized writes do not starve trace delivery.
 See [verification](verification.md) for the release and hardware test evidence.

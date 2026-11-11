@@ -1,4 +1,87 @@
-# Prüfstand — 2026-10-05
+# Prüfstand — KymoCore/KymoProbe 7.3.3, 11.11.2026
+
+## Aktueller Release und tatsächliche Hardwareprüfung
+
+KymoProbe `v7.3.3` verwendet das offizielle KymoCore `v7.3.3`
+(`0e195379efd051c20c5db09e3f634847c4f487d3`). Gegenstelle war KymoStudio
+2.9.0 auf `feat/ui-polish`, Commit `5148abd75aeb5cfe2132138d38d7e7c692a15478`.
+Die Studio-Bedienung erfolgte über den authentifizierten lokalen MCP-Server:
+Quellen, Parameter, ELF/Watch, Diagramme, Aufnahmen, Exporte und Replay.
+Getestetes Board: ESP32 mit CP210x an **COM4** unter Windows.
+
+Die bestehende Baseline `v7.3.0` bleibt auf `4ad2ba3` erhalten. Text-Signale
+und Low-Level-Benchmark behalten ihren Diagnosezweck; die übrigen Anwendungen
+verwenden Endpoint und getrennte Feature-Dateien. Metadaten-Requests beim
+Verbindungsaufbau sind nicht Teil dieses Releases; Trace wiederholt seine
+Metadaten und sein Wörterbuch weiterhin zyklisch.
+
+### Automatisierte Prüfungen
+
+| Prüfung | Ergebnis |
+|---|---|
+| Core: vollständige native Suite | Bestanden, inklusive optionaler Features, Teilübertragung, Stop/Drain, Metadaten-Wiederholung und gemeinsamer Uhr |
+| Konfigurator | 80 Tests, 108 Untertests bestanden; ein Test übersprungen |
+| Paket | Archiv/Manifeste, portable Verbraucher und Uno-/ESP32-Beispiele bestanden; PlatformIO 7.3.3 frisch installiert |
+| Probe/Studio-Protokollintegration | Vollständig bestanden; 256 Kanäle, 8 Layouts, 42 Fragmentgrößen, CRC-Wiederaufnahme |
+| Vollständiges Integrationsbeispiel | Parameter, Watch, Memory, Plot und abgeschlossene Trace-Session; mit/ohne Host-Anfragen und Rückstau bestanden |
+| Zusätzliche Probe-Tests | Profile, Stress, Feature-Demo, 8192 Messsignal-Frames/FFT, FreeRTOS-Adapter und spätes Trace-Verbinden bestanden |
+| PlatformIO | **44 von 44** Konfigurationen bestanden; Einzelauflistung in der JSON-Datei unten |
+| KymoStudio | Vollständiger Lauf nach Neustart: **647 Tests und 321 Untertests bestanden** |
+| MCP-Vertragsprüfung | HTTP, stdio und Legacy-Client bestanden, einschließlich Export und Fehlerfällen |
+| Struktur/Dokumentation | 316 C/C++-Dateien geprüft; Doxygen ohne Warnungen |
+
+### Live-Prüfungen mit dem offiziellen Core 7.3.3
+
+| Firmware | Über MCP geprüfter Ablauf | Ergebnis |
+|---|---|---|
+| PI Controller / Plot + Parameter | Drei Parameter entdeckt; `kp=2.0`, Sollwert `55` geschrieben und vom Gerät bestätigt; `95` durch Studio-Grenzwertprüfung abgewiesen; Gerätezeitstempel geprüft | Bestanden; 1003 Messwerte aufgezeichnet, Speicherung abgeschlossen, Aufnahme erneut geöffnet und CSV exportiert |
+| Live Variables / Watch | Passendes ELF mit 266 Variablen geladen; `wave` und `loopCounter` abonniert, Periode von 50 auf 20 ms geändert, Counter abbestellt | Bestanden; Build-ID passt, beide Signale verwenden Gerätezeitstempel |
+| Memory Telemetry | Kanäle 220–224 für drei Task-Stacks und Heap geprüft; Speicherdiagramm, CSV und PNG erzeugt | Bestanden; fünf gültige Kanäle mit Gerätezeitstempeln |
+| Trace UART | Später Verbindungsaufbau, benannte Funktionen, Hotspots und Aufrufbaum; 12 s Capture; CSV/Chrome-Trace; Replay, Pause/Fortsetzen und Seek bis EOF | Bestanden; vollständige Capture-Datei, keine neuen Trace-Lücken während des Aufnahmeabschnitts |
+
+Die Trace-Datei enthält 1096 Batches, 1096 Health-Frames sowie zwei wiederholte
+Metadaten-/Wörterbuch-Paare (6 META- und 4 DICTIONARY-Fragmente). Sie ist vollständig
+abgeschlossen und nicht abgeschnitten. Beim Einstieg in den laufenden Trace ist
+ein `unpaired_or_mismatched_exit` dokumentiert; diese Lücke wächst während der
+Aufnahme nicht. Ein gerade offener Funktionsaufruf an der rechten Fenstergrenze
+wird von der Laufzeitstatistik ausgeschlossen. Die Quelle meldet außerdem
+Resynchronisation (bis 225 verworfene Bytes und einen ungültigen Frame), jedoch
+keine CRC-Fehler. Das ist **keine Abnahme eines lückenlosen Gesamtstarts**.
+Ein Live-Capture-Stop beendet die Board-Session nicht; Replay erreicht EOF ohne
+verifiziertes `SESSION_END`. Ein Seek hinter das Dateiende meldet entsprechend
+`target_reached=false`, nicht einen erfolgreich erreichten Zielzeitpunkt.
+
+### Gefundene Fehler und verbleibende Grenzen
+
+- Behoben: UART-TX-Puffer der Trace-Demo auf 1024 Bytes vor dem Portstart gesetzt.
+- Behoben in Core 7.3.2: Gerätezeitstempel für Parameter/Watch/Memory wiederhergestellt.
+- Behoben in Core 7.3.3: Plot und Steuerdaten verwenden denselben Zeitnullpunkt.
+  Der neue Test schlägt auf 7.3.2 fehl und prüft auch Initialisierung bei laufender
+  Uhr und uint32-Überlauf. Der Stress-Test prüft nun die echte Geräteuhr einschließlich
+  Überlauf, statt fälschlich einen Neustart der Zeit bei jeder Stream-Initialisierung
+  vorauszusetzen.
+- **Offener Studio-Befund:** Zwei Plot-PNG-Exporte mit der ursprünglichen Darstellung
+  liefen in einen Timeout. Die zurückbleibende Auftragssperre blockierte danach
+  einen Capture-Start. Nach Neustart der Testinstanz mit
+  `QT_QUICK_BACKEND=software` bestanden Plot-PNG, Memory-PNG und Trace-Capture/Replay.
+  Die PNGs wurden visuell geprüft. Die ursprüngliche Ursache ist nicht abschließend
+  geklärt; es wurde kein pauschaler Darstellungs-Fix in Studio eingebaut.
+- Die komplette Studio-Suite bestand im abschließenden Lauf. Vorherige Läufe unter
+  paralleler Build-/Hardwarelast hatten einzelne nicht dauerhaft reproduzierbare
+  Qt-/TCP-Testfehler; Assertions und Zeitgrenzen wurden nicht abgeschwächt.
+- Physisch geprüft ist der ESP32 an COM4. AVR, STM32, ESP32-S3/C3 und Netzwerk-
+  Varianten sind gebaut bzw. nativ geprüft; kein Live-Broker-/TCP-/UDP-Test,
+  kein Dauertest und keine Abnahme anderer Boards oder echter Sensoren/Aktoren.
+
+Die [maschinenlesbaren Ergebnisse](validation-v7.3.3.json) enthalten alle 44
+Build-Konfigurationen, genaue Versionen sowie SHA-256-Werte der lokalen Artefakte.
+MCP-Protokoll, Messdateien, Bilder und Einzelprotokolle liegen lokal unter
+`.pio/hardware-7.3.1/`; der bestehende Ordnername bleibt erhalten, die endgültigen
+Dateien tragen `733`. Build-/Host-Logs stehen unter `.pio/verify-733-*`,
+`.pio/verify-native-733.log` und `.pio/verify-studio-post-reboot.log`.
+Rohaufnahmen und Zugangsdaten werden nicht ins Repository übernommen.
+
+## Historische Prüfstände
 
 ## KymoCore 7.3.0 und modulare Beispiele — 11.11.2026
 
