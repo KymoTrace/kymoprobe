@@ -1,7 +1,7 @@
 # KymoProbe examples
 
 All examples use the official KymoCore release pinned in `lib/KymoCore`
-(currently **7.3.2**). Probe release tags use the same version as Core;
+(currently **7.3.3**). Probe release tags use the same version as Core;
 see [release and tag policy](../docs/releases.md).
 
 For the modular Endpoint integration start with

@@ -1,6 +1,6 @@
 {
   "name": "ProbeEndpoint",
-  "version": "7.3.2",
+  "version": "7.3.3",
   "description": "Application-owned shared Endpoint storage and board port for KymoProbe examples",
   "build": { "includeDir": "src", "srcDir": "src" }
 }

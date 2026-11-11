@@ -41,7 +41,7 @@ Das Gerät behält dann den alten Wert und meldet ihn zurück, Studio zeigt „a
 
 ## Bauen und ausprobieren
 
-Das Beispiel verwendet KymoCore 7.3.2; das Beispiel baut gegen das Submodul `lib/KymoCore`.
+Das Beispiel verwendet KymoCore 7.3.3; das Beispiel baut gegen das Submodul `lib/KymoCore`.
 
 ```bash
 pio run -d examples/esp32/pi_controller -t upload --upload-port COM4
