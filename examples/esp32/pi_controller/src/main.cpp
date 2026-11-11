@@ -40,12 +40,6 @@ static uint32_t lastControlMs = 0u;
 
 uint32_t backChannelMaxUs = 0u;
 
-/** @brief Encode and send one sample with the device time.
- * @param[in] id Signal identifier. @param[in] value Value. @param[in] nowMs Device time. */
-
-/** @brief Read what the host sent, apply writes, answer list requests and readbacks.
- * @param[in] nowMs Device time for the readbacks. */
-
 /** @brief One PI step with anti-windup and one step of the heater model. */
 /*******************************************************************************
  * controlStep

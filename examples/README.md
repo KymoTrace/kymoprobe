@@ -1,16 +1,17 @@
 # KymoProbe examples
 
 All examples use the official KymoCore release pinned in `lib/KymoCore`
-(currently **7.3.0**). Probe release tags use the same version as Core;
+(currently **7.3.2**). Probe release tags use the same version as Core;
 see [release and tag policy](../docs/releases.md).
 
 For the modular Endpoint integration start with
 [integration/README.md](integration/README.md) and
 [integration/src/main.cpp](integration/src/main.cpp): one base and separate
 Plot, Parameter, Watch, Memory and Trace headers/implementations. The explicit
-feature configs and status checks remain visible. The existing transport,
-benchmark and generated demos continue to show supported lower-level APIs;
-they do not require an Endpoint to work with 7.3.0.
+feature configs and status checks remain visible. The existing application,
+transport and generated demos also use Endpoint and separate feature files.
+The text-protocol diagnostic and low-level benchmark retain their diagnostic
+purpose with separate feature and transport/reporting code.
 
 The larger transport, maximum-throughput and feature applications are selected
 by the repository's central `src/main.cpp`. See [demo modes](../docs/demo-modes.md).
@@ -37,12 +38,13 @@ values. The previous running task/ISR/pipeline firmware is preserved separately 
 [task trace example](esp32/task_trace_example/RESTORE.md), including its active
 generated configuration and source checksums.
 
-Arduino and serial ESP32 examples share `common/arduino_serial_config.h` and
-send deterministic waveforms through the C Init/Main API. Modify the sample
+Arduino and serial ESP32 examples share `lib/ProbeEndpoint` bindings and
+send deterministic waveforms through Endpoint. Modify the sample
 callback to acquire actual sensor values. The multidimensional example uses
 three independently scheduled channels. The `.ino` is the single entrypoint
 source; PlatformIO's `src/main.cpp` includes it to avoid duplicate code.
-Keep `examples/common` with the sketches when using the Arduino IDE.
+Install both KymoCore and the application support library `lib/ProbeEndpoint`
+when using these sketches in the Arduino IDE.
 
 KymoCore defaults to scalar Y plus the C runtime. These example PlatformIO
 files explicitly enable timestamps; the multidimensional example additionally

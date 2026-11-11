@@ -43,7 +43,7 @@ normal branch CI checks the pinned dependency without demanding a new tag.
 The new checks apply to commits containing them; the preserved baseline is not
 rewritten to add CI or fix historical files.
 
-## 7.3.1 example migration
+## 7.3.2 example migration
 
 The application examples now use Endpoint and separate feature bindings (`kymo_plot`,
 `kymo_param`, `kymo_watch`, `kymo_memory`, `kymo_trace`). `lib/ProbeEndpoint` owns
@@ -64,3 +64,8 @@ must be stopped before any future Endpoint stop/reinitialization. UART accepts
 bounded partial writes, including frames larger than the hardware FIFO.
 
 The original Probe v7.3.0 baseline remains unchanged.
+
+Core 7.3.2 also preserves device timestamps for Parameter, Watch and Memory
+samples. The Trace UART example allocates a 1024-byte serial TX buffer before
+opening the port so that FIFO-sized writes do not starve trace delivery.
+See [verification](verification.md) for the release and hardware test evidence.

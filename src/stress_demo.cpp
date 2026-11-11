@@ -62,11 +62,6 @@ static uint32_t readStressClockMs(void *user)
     return millis();
 }
 
-/** @brief Generate distinct bounded ramps, without expensive trigonometry.
- * @param[in] user Unused. @param[in] id Channel ID.
- * @param[out] out Coordinates in [-1, 1]. @return One on success, zero otherwise.
- * @note Not ISR-safe. Each channel advances only when actually sampled. */
-
 /** @brief Copy one core frame into application-owned batch storage.
  * @param[in] user Unused. @param[in] bytes Borrowed frame bytes.
  * @param[in] length Byte count. @return Length when copied, zero if full. */

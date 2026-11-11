@@ -15,9 +15,6 @@ static const uint32_t SAMPLE_PERIOD_MS = 10u;
 static uint32_t lastSampleMs = 0u;
 static uint32_t sampleIndex = 0u;
 
-/** @brief Send one JSON measurement line.
- * @param[in] id Signal identifier. @param[in] value Measured value. */
-
 /** @brief Initialize the board UART. */
 /*******************************************************************************
  * setup

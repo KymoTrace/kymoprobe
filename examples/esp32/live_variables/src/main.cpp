@@ -39,12 +39,6 @@ static ProbeCore core;
 static KymoStatus status = KYMO_BAD_CONFIG;
 static uint32_t lastStepMs = 0u;
 
-/** @brief Encode and send one sample with the device time.
- * @param[in] point Sample from KymoWatch. @param[in] nowMs Device time. */
-
-/** @brief Read host requests, send replies and every due live-variable sample.
- * @param[in] nowMs Device time. */
-
 /** @brief Let the variables change: a counter, a sine, a slow motor model. */
 /*******************************************************************************
  * step
@@ -62,9 +56,6 @@ static void step(uint32_t nowMs)
     motor.current = 0.2f + (rpm / 1000.0f);
     alarmActive = rpm > 2800.0f;
 }
-
-/** @brief Fill the build ID from the app description; all zeros means unknown.
- * @return Number of build ID bytes (0 or 16). */
 
 /** @brief Start the UART and allow reads of .data and .bss. */
 /*******************************************************************************

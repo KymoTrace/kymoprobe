@@ -40,26 +40,6 @@ static WorkerConfig_T sWorkers[WORKER_COUNT] = {
     {KYMO_CONTEXT_SLOW_WORKER, 70u, 1500u, 3000u},
     {KYMO_CONTEXT_BACKGROUND_WORKER, 80u, 700u, 1600u}
 };
-/** @brief Shared microsecond clock, callable from task and timer ISR context.
- * @param[in] user Unused callback cookie. @return Monotonic ticks at 1 MHz. */
-
-/** @brief Identify the calling CPU. @param[in] user Unused cookie.
- * @return Core index 0 or 1. */
-
-/** @brief Resolve the current or interrupted task; SDK/idle tasks remain unknown.
- * @param[in] user Unused cookie. @return Registered context or zero. */
-
-/** @brief Serialize recorder access across both CPUs and ISR/task callers.
- * @param[in] user Unused cookie. @note ISR-aware lock; no UART inside it. */
-
-/** @brief Release the recorder lock. @param[in] user Unused cookie. */
-
-/** @brief Accept only complete UART frames, exclusively from loop().
- * @param[in] user Unused cookie. @param[in] bytes Frame, required.
- * @param[in] length Frame bytes. @return Accepted bytes, or zero for retry. */
-
-/** @brief Supply a boot-specific session. @return Session ID for metadata. */
-
 /** @brief Generate task-side random durations. @param[in] minimum Lower bound.
  * @param[in] maximum Upper bound. @return Duration in inclusive range. */
 /*******************************************************************************
@@ -409,8 +389,6 @@ static bool initializeTimer(timer_idx_t timer, timer_isr_t callback)
     }
     return result;
 }
-
-/** @brief Publish metadata immediately, then periodically for late connections. */
 
 /** @brief Initialize recorder, static tasks and real timer interrupts.
  * @note Partial initialization leaves tasks gated and alarms disabled. */

@@ -76,13 +76,6 @@ static void parserTask(void *arg)
     }
 }
 
-/** @brief KymoMemory callback: peak stack use or heap level of one entry in bytes.
- * @param[in] context Unused. @param[in] index Entry index. @param[out] bytes Value.
- * @return 1 when the value is valid. */
-
-/** @brief Send one DATA point with the device time.
- * @param[in] point Channel and value. @param[in] nowMs Device time. */
-
 /** @brief Start the UART, the worker tasks and KymoMemory; setup() runs in the loop task. */
 /*******************************************************************************
  * setup

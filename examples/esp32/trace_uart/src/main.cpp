@@ -50,6 +50,8 @@ void traceInstrumentedWork(uint32_t iteration)
  ******************************************************************************/
 void setup(void)
 {
+    const size_t TRACE_TX_BUFFER_BYTES = 1024u;
+    (void)Serial.setTxBufferSize(TRACE_TX_BUFFER_BYTES);
     Serial.begin(460800u);
     kymoTracePortInit();
     const KymoEndpointConfig port = kymoPortConfig();

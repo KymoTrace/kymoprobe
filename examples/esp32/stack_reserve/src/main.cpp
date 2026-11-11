@@ -78,9 +78,6 @@ static void parserTask(void *arg)
     }
 }
 
-/** @brief Encode and send one signal with the shared timestamp.
- * @param[in] id Signal identifier. @param[in] value Value. @param[in] nowMs Device time. */
-
 /** @brief Start the UART and the two worker tasks; setup() runs in the loop task. */
 /*******************************************************************************
  * setup
