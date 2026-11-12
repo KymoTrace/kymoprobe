@@ -43,6 +43,18 @@ normal branch CI checks the pinned dependency without demanding a new tag.
 The new checks apply to commits containing them; the preserved baseline is not
 rewritten to add CI or fix historical files.
 
+## 7.3.4 formatting release
+
+All examples now consume the official KymoCore `v7.3.4` submodule release.
+The library, its reference examples and native tests use reproducible C/C++
+formatting with the bundled `.clang-format`. APIs, runtime behavior and the wire
+protocol are unchanged. `ProbeEndpoint` and the current dependency references
+use the matching version. Existing tags, including the original `v7.3.0`
+baseline and `v7.3.3`, remain unchanged.
+
+See [verification](verification.md) for automated checks and the separate
+historical hardware results.
+
 ## 7.3.3 example migration
 
 The application examples now use Endpoint and separate feature bindings (`kymo_plot`,
