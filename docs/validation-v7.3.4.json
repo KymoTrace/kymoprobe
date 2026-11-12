@@ -1,0 +1,87 @@
+{
+  "date": "2026-11-12",
+  "version": "7.3.4",
+  "core_commit": "4c50d750dd531b232f649462c845b1a9615c278c",
+  "probe_dependency_commit": "14cb2bbb25ec71bb03f9a68d6b3bc6fa621cb824",
+  "checks": [
+    {
+      "log": "native.log",
+      "result": "passed",
+      "sha256": "9ee099086e8b9d03edcd31128d19b6de78f8f67b7a221ae9dd8acf856a612341"
+    },
+    {
+      "log": "config.log",
+      "result": "passed",
+      "sha256": "153fd473181e189136f7b9382eeba93f09a985c2b53f1ef42175a89e0370a4e2"
+    },
+    {
+      "log": "stress.log",
+      "result": "passed",
+      "sha256": "a4731fd6b6ca6fb344e08c0571c62bc9c7c127686e68461ec8bb1104ae454a50"
+    },
+    {
+      "log": "features.log",
+      "result": "passed",
+      "sha256": "6ca4f7517a20fa298a9be0f008c1fde798ada1dec1f014963b751e594e5132d8"
+    },
+    {
+      "log": "root-builds.log",
+      "result": "passed",
+      "sha256": "2cd2a15deb19cfb5944fbca69a542238b3fe49d741675dc7252d085d320481df"
+    },
+    {
+      "log": "uno.log",
+      "result": "passed",
+      "sha256": "ab876775f36cafb9ff3f835d1276734882d74372549c02ff39dcbc855c5e553f"
+    },
+    {
+      "log": "mqtt.log",
+      "result": "passed",
+      "sha256": "077253f90005be4b523c0fdec2ecc5ee22594108226e6f9bbbad1733f73a3a47"
+    },
+    {
+      "log": "stm32.log",
+      "result": "passed",
+      "sha256": "fe514c7eb2dee95054d97839f1da25a3383b11a0dadfe3d9cad93fdeedaeaf08"
+    }
+  ],
+  "firmware_builds": [
+    {
+      "project": ".",
+      "environment": "nodemcu-32s",
+      "result": "passed"
+    },
+    {
+      "project": ".",
+      "environment": "nodemcu-32s-features",
+      "result": "passed"
+    },
+    {
+      "project": ".",
+      "environment": "nodemcu-32s-trace",
+      "result": "passed"
+    },
+    {
+      "project": ".",
+      "environment": "nodemcu-32s-stress-tcp-xyz",
+      "result": "passed"
+    },
+    {
+      "project": "examples/arduino/multi_sensor_example",
+      "environment": "uno",
+      "result": "passed"
+    },
+    {
+      "project": "examples/esp32/wifi_mqtt_example",
+      "environment": "esp32dev",
+      "result": "passed"
+    },
+    {
+      "project": "examples/stm32/uart_example",
+      "environment": "nucleo_f401re",
+      "result": "passed"
+    }
+  ],
+  "hardware_tested": false,
+  "hardware_baseline": "docs/validation-v7.3.3.json"
+}

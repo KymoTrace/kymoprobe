@@ -1,6 +1,32 @@
-# Prüfstand — KymoCore/KymoProbe 7.3.3, 11.11.2026
+# Prüfstand — KymoCore/KymoProbe
 
-## Aktueller Release und tatsächliche Hardwareprüfung
+## Release 7.3.4 — 12.11.2026
+
+KymoProbe verwendet das offizielle KymoCore `v7.3.4`
+(`4c50d750dd531b232f649462c845b1a9615c278c`). Die Library-Formatierung ist
+übernommen; API, Laufzeitverhalten und Protokoll bleiben unverändert.
+Alle bisherigen Tags einschließlich der unveränderten Baseline `v7.3.0`
+bleiben erhalten.
+
+| Prüfung | Ergebnis |
+|---|---|
+| Release-Zuordnung | Sauberes, abgetrenntes Core-Submodul; 25 Verbraucher-Verweise geprüft |
+| Core: native Suite und Paket | Bestanden; Archiv-Verbraucher für Uno und ESP32 gebaut |
+| Konfigurator | 81 Tests und 108 Untertests bestanden |
+| PlatformIO-Auslieferung | 7.3.4 frisch installiert; Quellen und Formatierungskonfiguration abgeglichen; ESP32-Build bestanden |
+| Probe: vollständiger nativer Lauf mit KymoStudio | Bestanden; CRC an/aus, 256 Kanäle, 8 Layouts, 42 Fragmentgrößen und vollständige Trace-Sessions mit/ohne Host-Anfragen |
+| Probe-Konfiguration, Stress und Feature-Demo | Bestanden |
+| Probe-Firmware | 7 von 7 Builds bestanden: ESP32 Standard, Features, Trace, XYZ-TCP-Stress, Uno Multi-Sensor, ESP32 MQTT und STM32 UART |
+| Core GitHub CI | Native Tests, Konfigurator Linux/Windows, Paket, Arduino-Lint und ESP-IDF-Build bestanden |
+
+Die Einzelauflistung und lokalen Log-Prüfsummen stehen in
+[validation-v7.3.4.json](validation-v7.3.4.json). Die lokalen Logs liegen unter
+`.pio/release-7.3.4/`. Mit 7.3.4 wurde keine neue Hardwareprüfung durchgeführt;
+die folgenden Hardware-Ergebnisse gehören ausschließlich zu 7.3.3.
+
+## Hardware-Baseline 7.3.3 — 11.11.2026
+
+### Release und tatsächliche Hardwareprüfung
 
 KymoProbe `v7.3.3` verwendet das offizielle KymoCore `v7.3.3`
 (`0e195379efd051c20c5db09e3f634847c4f487d3`). Gegenstelle war KymoStudio
