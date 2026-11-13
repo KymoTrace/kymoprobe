@@ -1,5 +1,6 @@
 /* SPDX-License-Identifier: MIT
  * Copyright (c) 2026 Christof Seidel */
+#if defined(PLATFORMIO)
 #include <KymoCore.h>
 
 #if KYMO_EFFECTIVE_RUNTIME
@@ -17,4 +18,5 @@ void setup() {}
  * loop
  ******************************************************************************/
 void loop() {}
+#endif
 #endif

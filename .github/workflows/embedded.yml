@@ -84,6 +84,8 @@ jobs:
             environment: nodemcu-32s-trace-production
           - project: .
             environment: nodemcu-32s-trace-flow
+          - project: examples/arduino/quickstart
+            environment: uno
           - project: examples/arduino/simple_analog_example
             environment: uno
           - project: examples/arduino/multi_sensor_example
