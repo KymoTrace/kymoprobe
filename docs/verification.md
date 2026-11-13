@@ -1,5 +1,36 @@
 # Prüfstand — KymoCore/KymoProbe
 
+## Update auf KymoCore 7.4.0 — 13.11.2026
+
+Das Submodul verwendet den offiziellen Core-Tag `v7.4.0`
+(`0a0ad50be5e72f20baceda5f9365ff17f6fa8d3a`).
+Geprüfter Probe-Code ist `3685713` auf `develop`.
+
+| Prüfung | Ergebnis |
+|---|---|
+| Versionsvertrag | Core sauber und detached, 28 Verbraucher-Verweise auf das Submodul |
+| Vollständige native Suite und KymoStudio-Abgleich | Bestanden, einschließlich Variablenbindung, CRC, Fragmentierung und Trace-Sessions |
+| Probe-Konfiguration, Feature- und Stress-Demo | Bestanden |
+| ADC-Quickstart | Uno, Nano und Mega bestanden |
+| Arduino-Wellenformen | Simple Analog und Multi-Sensor auf Uno bestanden |
+| Natives Endpoint-Beispiel | Build und Ausführung bestanden, zehn Frames mit gebundenem Wert geprüft |
+| ESP32 | Standard, Features, Trace, Serial und MQTT bestanden |
+| STM32 | UART auf Nucleo F401RE bestanden |
+| GitHub CI | 37 Jobs bestanden, Native-Job am bestehenden Studio-Download mit HTTP 404 gescheitert |
+
+Insgesamt wurden lokal zwölf PlatformIO-Konfigurationen gebaut.
+Buildlogs liegen unter `.pio/release-7.4.0/`. Der lokale Studio-Abgleich
+verwendet die vorhandene Arbeitskopie `../KymoStudio`.
+Hardwaretests wurden bei diesem Update nicht durchgeführt.
+
+Der CI-Download verweist weiterhin auf
+`https://kymotrace.de/downloads/v2.1.1/KymoStudio_2.1.1_Sources.zip`.
+Derselbe Fehler bestand bereits beim 7.3.4-Lauf. Der öffentliche
+producer-to-consumer-CI-Test bleibt bis zur Bereitstellung einer erreichbaren,
+fest versionierten Studio-Testquelle offen.
+[CI-Lauf](https://github.com/KymoTrace/kymoprobe/actions/runs/43466532113)
+
+
 ## Release 7.3.4 — 12.11.2026
 
 KymoProbe verwendet das offizielle KymoCore `v7.3.4`
