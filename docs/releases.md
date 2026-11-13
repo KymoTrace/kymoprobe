@@ -43,6 +43,15 @@ normal branch CI checks the pinned dependency without demanding a new tag.
 The new checks apply to commits containing them; the preserved baseline is not
 rewritten to add CI or fix historical files.
 
+## 7.4.0 variable binding
+
+The pinned Core release is `v7.4.0` (`0a0ad50be5e72f20baceda5f9365ff17f6fa8d3a`).
+The Arduino quickstart demonstrates two bound ADC variables using the runtime.
+The native example uses the same binding through Endpoint Plot.
+Sketch wrappers enable their `.ino` include only for PlatformIO so Arduino IDE
+builds have one definition of `setup()` and `loop()`.
+`ProbeEndpoint` and current dependency references use version 7.4.0.
+
 ## 7.3.4 formatting release
 
 All examples now consume the official KymoCore `v7.3.4` submodule release.

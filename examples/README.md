@@ -1,8 +1,14 @@
 # KymoProbe examples
 
 All examples use the official KymoCore release pinned in `lib/KymoCore`
-(currently **7.3.4**). Probe release tags use the same version as Core;
+(currently **7.4.0**). Probe release tags use the same version as Core;
 see [release and tag policy](../docs/releases.md).
+
+For the first ADC curves start with the
+[Arduino variable-binding quickstart](arduino/quickstart/README.md).
+The native example also uses `Kymo_SampleBound` through Endpoint Plot.
+Waveform calculations, multidimensional samples and callbacks with side effects
+continue to use their dedicated readers.
 
 For the modular Endpoint integration start with
 [integration/README.md](integration/README.md) and
@@ -22,6 +28,7 @@ Primary examples (run from repository root):
 
 ```sh
 pio run -e nodemcu-32s
+pio run -d examples/arduino/quickstart -e uno
 pio run -d examples/integration -e esp32dev -e uno
 pio run -d examples/arduino/simple_analog_example -e uno
 pio run -d examples/arduino/multi_sensor_example -e uno
@@ -46,7 +53,7 @@ source; PlatformIO's `src/main.cpp` includes it to avoid duplicate code.
 Install both KymoCore and the application support library `lib/ProbeEndpoint`
 when using these sketches in the Arduino IDE.
 
-KymoCore defaults to scalar Y plus the C runtime. These example PlatformIO
+KymoCore defaults to scalar Y plus the C runtime. The waveform example PlatformIO
 files explicitly enable timestamps; the multidimensional example additionally
 enables X and Z. The repository-root application uses the minimal defaults.
 For Arduino IDE/other build systems, pass matching `KYMO_ENABLE_*` compiler

@@ -1,25 +1,22 @@
 /* SPDX-License-Identifier: MIT */
-/** @file kymo_plot.cpp @brief Portable channel and constant sample. */
+/** @file kymo_plot.cpp @brief Portable scalar variable binding through Endpoint Plot. */
 #include "kymo_plot.h"
-/*******************************************************************************
- * readSample
- ******************************************************************************/
-static uint8_t readSample(void *user, uint8_t id, KymoSample *sample)
-{
-    uint8_t valid = 0u;
-    (void)user;
-    if ((sample != nullptr) && (id == 7u)) { sample->value = 1.25f; valid = 1u; }
-    return valid;
-}
+
+static const float value = 1.25f;
+static const KymoChannel channels[] = {{20u, 7u, 0u}};
+static const float *const values[] = {&value};
+static_assert(KYMO_COUNT_OF(values) == KYMO_COUNT_OF(channels), "one variable per channel");
+static KymoPlotBinding binding = {channels, values, KYMO_COUNT_OF(channels)};
+
 /*******************************************************************************
  * kymoPlotConfig
  ******************************************************************************/
 KymoEndpointPlotConfig kymoPlotConfig(void)
 {
-    static const KymoChannel channels[] = {{20u, 7u, 0u}};
     KymoEndpointPlotConfig config = {};
     config.channels = channels;
     config.channel_count = KYMO_COUNT_OF(channels);
-    config.sample = readSample;
+    config.sample = Kymo_SampleBound;
+    config.sample_user = &binding;
     return config;
 }

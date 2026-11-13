@@ -1,13 +1,17 @@
 # Arduino
 
-Use `simple_analog_example` for two waveform channels, or
-`multi_sensor_example` for Y/XY/XYZ. Both use `Kymo_Init` and `Kymo_Main`.
-Change channel periods, flags and the sample callback in
-`../common/arduino_serial_config.h`. Replace waveform generation with
-`analogRead(A0)` for actual ADC measurements. Select Uno, Nano or Mega in the
-project's platformio.ini. Serial connection: 115200, 8N1, KymoStudio binary v6.
-See [example build instructions](../README.md).
+Start with [quickstart](quickstart/README.md) to plot two ADC variables using
+KymoCore 7.4.0's `KymoPlotBinding` and `Kymo_SampleBound`. The example uses
+`Kymo_Init` and `Kymo_Main` with default settings. Its README explains how to
+enable device timestamps.
 
-For optional C++ push use, `../common/kymo_arduino.h` contains PrintStream.
-Instantiate it explicitly and pass it to `Kymo`. The library itself does not
-include Arduino Print.h. The recommended C Init/Main examples need no wrapper.
+Use `simple_analog_example` for two generated waveform channels or
+`multi_sensor_example` for Y/XY/XYZ. These examples use Endpoint and the
+shared waveform configuration in `lib/ProbeEndpoint/src/probe/kymo_plot.cpp`.
+Their PlatformIO configurations enable the required Endpoint and payload
+features.
+
+Select Uno, Nano or Mega in each project's `platformio.ini`. All examples
+consume the official KymoCore release pinned in `lib/KymoCore`.
+Serial connection is 115200 baud, 8N1, KymoStudio binary v6.
+See [example build instructions](../README.md).
